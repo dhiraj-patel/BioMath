@@ -1,0 +1,179 @@
+---
+title: "Lab3HWPatelDhiraj"
+author: "Dhiraj Patel"
+date: "4/9/2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+## Lab 3 Homework
+
+For all of the problems below you should use RStudio to answer the questions in this document. Please show all of your commands to read the data, plot and perform analysis. The homework is due one week after your lab day at 1:30pm on Chalk. 
+
+## Confidence Intervals from a normal distribution
+
+As you will learn in lecture, confidence intervals help us gauge the reliability of an estimate. Assuming we have an estimate of the mean and standard deviation of a population, for a normal distribution we can calculate the 95% confidence interval as follows:
+
+```{r comment = ''}
+sampleMean <- 10
+SD <- 3
+n <- 30
+error <- qnorm(0.975) * SD / sqrt(n)
+lower <- sampleMean - error #lower value of the 95% confidence interval
+upper <- sampleMean + error # upper value of the 95% confidence interval
+CI95 <- c(lower, upper)
+CI95
+```
+
+We'll talk more about the command `qnorm()` in a later lab, but for now what you need to now is that `qnorm(0.975)` gives the x-value for which the area under the standard normal distribution is 97.5% of the total area under the curve (which is 1).
+
+```{r comment = ''}
+qnorm(0.975)
+```
+
+
+<span style="color:green">
+1. Why did we use `qnorm(0.975)` instead of `qnorm(0.95)` to find the 95% confidence interval?
+</span>
+
+<span style="color:blue">We used `qnorm(0.975)` instead of `qnorm(0.95)` because you need to account for both the lower and upper values of the 95% confidence interval, which is 2.5% above and 2.5% below 95%.</span>
+
+<span style="color:green">
+2. Use the code above to write a function for the 90% confidence interval. Use this function and the `aggregate()` command to calculate the 90% confidence interval for each of the groups in `PlantGrowth` data.
+</span>
+
+```{r}
+confidenceInterval <- function(vec){
+  sampleMean <- mean(vec)
+  std <- sd(vec)
+  n <- length(vec)
+  error <- qnorm(0.95) * std / sqrt(n)
+  lower <- sampleMean - error #lower value of the 90% confidence interval
+  upper <- sampleMean + error # upper value of the 90% confidence interval
+  ans <- c(lower,upper)
+  return (ans)
+}
+
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=confidenceInterval)
+```
+
+
+<span style="color:green">
+3. Modify your function from question 21 to write a function for the 99% confidence interval. Calculate the 99% confidence interval for all the groups in `PlantGrowth`. Compare to the 90% confidence intervals, which one is smaller? Why?</span>
+
+```{r}
+confidenceIntervalNumThree <- function(vec){
+  sampleMean <- mean(vec)
+  std <- sd(vec)
+  n <- length(vec)
+  error <- qnorm(0.995) * std / sqrt(n)
+  lower <- sampleMean - error #lower value of the 90% confidence interval
+  upper <- sampleMean + error # upper value of the 90% confidence interval
+  ans <- c(lower,upper)
+  return (ans)
+}
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=confidenceIntervalNumThree)
+
+#The 99% distribution is smaller, because a 95% confidence interval is narrower than a 99% confidence interval which is wider.
+```
+
+
+<span style = "color:green"> 
+4. We're going to take another look at the dengue DNA sequence that we started analyzing for lab 1. After setting your working directory to the folder where you have saved the dengue sequence file, run the following commands in R: </span>
+
+```{r}
+library('seqinr')
+dengue <- read.fasta(file = 'dengue_seq.txt')
+dengue_vec <- as.vector(dengue[[1]])
+```
+
+<span style = "color:green"> 
+(a) Write a **single function** called `GC_content` that takes in a sequence and calculate the GC content of the sequence. You can refer to your code from homework 1 for help, but make sure your final code is written as a function.</span>
+
+```{r}
+GC_content <- function(tideSeq){
+  length <- 0
+  ctides<- 0
+  gtides <- 0
+  for(i in tideSeq){
+    length <- length + 1
+    if(i=="g"){
+      gtides <- gtides + 1
+    }
+    if(i=="c"){
+      ctides <- ctides + 1
+    }
+  }
+  gccontent <- ((gtides + ctides)/(length))*(100)
+  return(gccontent)
+}
+GC_content(dengue_vec)
+```
+
+
+<span style = "color:green">
+(b) Recall our sampling function `funkySampler()` given in the lab above. Modify the function so that, for each sample that you take, you use your function from part (a) to calculate the GC-content of that sample (note that we will now be sampling from a character vector). Return the vector of these sample GC contents. Write your function below.</span>
+
+```{r}
+
+funkySampler <- function(dataset, sample, n){
+    results <- numeric(n)
+    for(i in 1:n){
+        vectorSample <- sample(dataset, sample)
+        results[i] <- GC_content(vectorSample)
+    }
+    return(results)
+}
+
+```
+
+
+<span style = "color:green">
+(c)  Use your code from part (b) and perform four different simulations where you sample from `dengue_vec` using a sample size of 9, 90, 900, and 9000. Keep the number of trials at 900 for each simulation. For each simulation, plot a histogram of the results vector and calculate the mean of the results vector. Describe how the distribution of the results changes as the sample size changes.</span>
+
+```{r}
+firstSim <- funkySampler(dengue_vec,9,900)
+hist(firstSim,main="Histogram of First Simulation w/ GC Content",col="blue", xlab="Nucleotide Sequence GC_Content")
+secSim <- funkySampler(dengue_vec,90,900)
+hist(secSim,main="Histogram of Second Simulation w/ GC Content",col="green", xlab="Nucleotide Sequence GC_Content")
+threeSim <- funkySampler(dengue_vec,900,900)
+hist(threeSim,main="Histogram of Third Simulation w/ GC Content",col="red", xlab="Nucleotide Sequence GC_Content")
+fourSim <- funkySampler(dengue_vec,9000,900)
+hist(fourSim,main="Histogram of Four Simulation w/ GC Content",col="yellow", xlab="Nucleotide Sequence GC_Content")
+
+
+#AS THE SAMPLE SIZE CHANGES, THE DISTRIBUTION BECOMES MORE AND MORE SYMMETRIC, AND BASICALLY PERFECTLY SYMMETRIC IN THE LAST HISTOGRAM. Basically, becomes more and more like a normal distribution. 
+```
+
+
+<span style = "color:green">
+(d) For each simulation, how do the means of your samples compare to the GC-content for the dengue DNA sequence as a whole?</span>
+
+<span style="color:blue">HELP</span>
+
+<span style="color:green">
+5. Read data from the file *MeaslesOutbreaks.csv* into R with the `read.csv()` command. Choose an appropriate variable name for this command. This data comes from Example 2.4A in the Whitlock Schluter textbook. </span>
+
+```{r}
+measlesOutbreakData <- read.csv("MeaslesOutbreaks.csv", header=TRUE,sep=",")
+```
+
+
+<span style="color:green">
+(a) Use the `plot()` command you learned in lab to plot a graph using `yearByQuarter` as the explanatory variable and `confirmedCases` as the response variable. Make sure to include axis labels and a title.</span>
+
+```{r}
+plot(measlesOutbreakData$yearByQuarter,measlesOutbreakData$confirmedCases,ylab="Confirmed Cases of Measles",xlab="Year by Quarter (years)",col="blue")
+```
+
+<span style="color:green">
+(b) Add the parameter `type="l"` to your `plot()` command from part (a). How does this change your graph?</span>
+
+```{r}
+plot(measlesOutbreakData$yearByQuarter,measlesOutbreakData$confirmedCases,ylab="Confirmed Cases of Measles",xlab="Year by Quarter (years)",col="blue",type="l")
+#Adding the type parameter, converts the scatter plot into essentially a line graph, by basically connecting all the dots in the previous plot.
+
+```
+
+
+![](./Images/qnorm_image.png)

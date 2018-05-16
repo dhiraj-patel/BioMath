@@ -1,0 +1,64 @@
+---
+title: "Lab5HWPatelDhiraj"
+author: "Dhiraj Patel"
+date: "5/4/2018"
+output: html_document
+---
+### Lab 5 Homework
+
+**Due Tuesday, 9 May 2017 at 11:59pm.**
+
+Human names are often of obscure origin, but many have fairly obvious sources. For example, "Johnson" means "son of John," "Smith" refers to an occupation, and "Whitlock" means "white-haired" (from "white locks"). In Lancashire, U.K., a fair number of people are named "Shufflebottom," a name whose origins remain obscure. 
+
+Before children learn to walk, they move around in a variety of ways, with most infants preferring a particular mode of transportation. Some crawl on hands and knees, some belly crawl commando-style, and some shuffle around on their bottoms. A group of researchers decided to ask whether the name "Shufflebottom" might be associated with a propensity to bottom-shuffle. To test this, they compared the frequency of bottom-shufflers among infants with the last name "Shufflebottom" to the frequency for infants named "Walker." (By the way, this study is real. See Fox et al. 2002.)
+
+They found that 11 out of 43 Walkers moved by bottom-shuffling, while 12 out of 45 Shufflebottoms did. Is there a significant difference between the groups?
+
+<span style="color:green">
+1.	State the null hypothesis and the alternative hypothesis for the independence test.
+</span>
+
+<span style="color:blue">Null hypothesis: There is no association between the name 'Shufflebottom' and a propensity to bottom shuffle. Alternative: There is an association between the name 'Shufflebottom' and a propensity to bottom-shuffle.</span>
+
+<span style="color:green">
+2.	Enter the observed values into a matrix in R. Next calculate the expected counts based on the assumption that hypothesis is true. Perform these calculations by hand and enter them into a matrix in R.
+</span>
+
+```{r}
+ocVec<-c(11,32,12,33)
+walkData <- matrix(data=ocVec, ncol=2,nrow=2,byrow=TRUE)
+
+```
+
+
+<span style="color:green">
+3.	Calculate the chi-squared statistic using the function you wrote in lab.
+</span>
+
+```{r}
+#Function Written in Lab5: 
+chiSquareTest <- function(observed,expected){
+  count<-0
+  for(i in 1:nrow(observed)){
+    for(j in 1:ncol(observed)){
+      count <- count + (((observed[i,j]-expected[i,j])^2)/(expected[i,j]))
+    }
+  }
+  return(count)
+}
+expWalkDataVec <- c(11.2,11.8,31.8,33.2)
+expWalkData<-matrix(data=expWalkDataVec,nrow=2,ncol=2,byrow=TRUE)
+chiSquareTest(walkData,expWalkData)
+```
+
+
+<span style="color:green">
+4.	Find the threshold chi-squared value using the `qchisq()` function with the correct degrees of freedom and significance levels $\alpha = 0.05, 0.01, 0.001$ and decide whether to reject the independence hypothesis at each significance level. 
+
+```{r}
+qchisq(0.95,1) #we reject the null hypothesis because the P-value is greater than the threshold. 
+qchisq(0.99,1) #we reject the null hypothesis because the P-value is greater than the threshold
+qchisq(0.999,1) #we reject the null hypothesis because the P-value is greater than the threshold. 
+```
+
+</span>

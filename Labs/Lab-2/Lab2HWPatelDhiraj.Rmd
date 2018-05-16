@@ -1,0 +1,98 @@
+---
+title: "Lab2HWPatelDhiraj"
+author: "Dhiraj Patel"
+date: "4/3/2018"
+output: html_document
+---
+
+<span style="color:green">TAKEN FROM LAB 2 ASSIGNMENT</span>
+```{r}
+myRange <- function(vec){
+  answerVec <- c(min(vec),max(vec))
+  return(answerVec)
+}
+# long way to do this is using a for loop to go through the vector to find largest and smallest integer value, but using the built-in functions its easier. 
+#This matches R's built-in range function. Range probably uses max/min or a for loop in their function 
+```
+
+
+
+<span style="color:green">TAKEN FROM LAB 2 ASSIGNMENT</span>
+```{r}
+testVec <- (seq(1,120,0.5))
+stdev <- function(vec){
+  vecLength <- length(vec)
+  answer <- sqrt(sum((vec - mean(vec))^2) / (vecLength - 1))
+  return(answer)
+}
+stdev(testVec)
+```
+
+## Lab 2 Homework
+
+The homework is due next Wednesday before lecture time.
+
+<span style="color:green">
+1. Load the data file called *titanic.csv* into R using methods from the lab. This file contains various data for some of the passengers of Titanic.</span>
+
+```{r}
+myData <- read.csv('titanic.csv', header = T, sep = ',')
+```
+
+<span style="color:green">
+(a) After loading the data into RStudio, click on the corresponding line in the Data section of RStudio's Environment panel (upper right). This should open a table containing various kinds of information. What sort of information is provided?</span>
+
+<span style="color:blue">The information in the data section consists of the passenger class, name, age, embarking destination and home destination, the sex of the passenger, and whether or not they survived the wreckage.</span> 
+
+<span style="color:green">
+(b) Plot a histogram for the age of the passengers (properly label the x axis and color the plot in green). Is the distribution skewed? Try different `breaks` values and use the one that best represent the data.</span>
+
+```{r}
+ages <- myData$Age
+hist(ages, main="Histogram for Passenger Age",xlab = 'Passenger Age (Years)', col = 'green', breaks = 6)
+
+#Distribution is positive skewed. 
+```
+
+
+<span style="color:green">
+(c) Use your own functions you wrote in the lab to calculate the range age of the passengers and the standard deviation.</span>
+
+```{r}
+ageRange <- myRange(ages)
+print("Age Range:")
+print(ageRange)
+
+print("Standard Deviation:")
+print(stdev(ages))
+```
+
+
+<span style="color:green">
+2. Write a function to calculate the standard deviation of a vector of numbers using the shortcut formula provided in lecture. Execute this function on a vector 1 through 120 with step size of 0.5. Does your answer match the number you obtained in the lab?</span>
+
+```{r}
+
+vecShortSD <- function(vec){
+  n <- length(vec)
+  ans<- sqrt((n/(n-1))*((sum(vec^2)/n)-((mean(vec))^2)))
+  return(ans)
+}
+
+#This is the same answer that I obtained in the lab. 
+```
+
+
+<span style="color:green">
+3. Write a function that takes in your first and last name as separate arguments, and using a SINGLE command (ie only 1 statement), have the function print both separated by a space. Heads up - this is challenging, as you will likely have to do some Google searching to find a function that allows you to do this!
+</span>
+
+```{r}
+foo <- function(first,last){
+  return(paste(first, last, sep=" "))
+}
+foo("dhiraj","patel")
+```
+
+
+

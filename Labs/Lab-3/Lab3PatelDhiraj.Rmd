@@ -1,0 +1,542 @@
+---
+title: 'Lab 3: Graphics and descriptive statistics using R'
+output: html_document
+---
+
+###<span style="color:green">This assignment is due at 11:59 p.m. the day of lab.\span
+
+<span style="color:red">Please submit your lab report by renaming this R Markdown file as "Lab2LastnameFirstname.Rmd" **(please replace Lastname and Firstname with your last and first names, respectively** and uploading it to the appropriate Lab 3 submission link on Chalk. Please provide answers in this document in the form of plain text and
+```{r eval = FALSE}
+code chunks #with comments when necessary
+```
+<span style="color:red">to all green questions. </span>
+
+## Graphics and Plotting
+
+R is a fantastic language for data-related graphics. Let's start to make some simple graphics of our own. First, we will use the built-in function `runif()` to create two vectors of equal length. `runif()` provides us with random numbers sampled from a uniform distribution between 0 and 1. The numerical argument passed to runif determines how many numbers it should sample. For example, try running `runif(10)` and look at the output. You should see 10 numbers distributed between 0 and 1. Because this command returns random numbers, if you run `runif(10)` again, you will see a different set of 10 numbers between 0 and 1. Next, try assigning the output to a vector as follows:
+
+```{r comment = ''}
+x <- runif(100)
+y <- runif(100)
+```
+
+To get a simple scatter plot, we can enter the following command:
+
+```{r eval = FALSE}
+plot(x, y)
+```
+
+This plot should appear in the bottom right-hand corner of your Rstudio window. What are the axis names? Let's try using variables that are not called x and y. R allows us to explicitly add names to the plot, add a title, and even change the color of our points. For example
+
+```{r}
+plot(x, y, xlab = "This is my x label", ylab = "This is my y label", col = "red", main = "Title goes here")
+```
+
+There are lots of different colors that we can use in our graphs - red, green, purple, salmon, darkslateblue, etc. A convenient reference list of color names can be found at <http://www.stat.columbia.edu/~tzheng/files/Rcolor>.
+
+Often you will want to plot two datasets on the same figure. After plotting the first dataset with the `plot()` function, you can add further data ("points") to the plot with the function `points()`. **`points()` has the same syntax as `plot()`**, except that you don't need to specify the axis labels and the main title again. 
+
+<span style="color:green">
+1. Using `plot()` and `points()`, plot TWO different datasets (each data set should have two variables) on the same graph of 75 number pairs drawn from the uniform distribution in DIFFERENT colors (show the commands you used in your script). Comment briefly on the distribution of the two datasets relative to each other. </span>
+
+```{r}
+first<-runif(75)
+second <- runif(75)
+third <- runif(75)
+fourth <- runif(75)
+
+plot(first,second, col="green")
+points(third,fourth, col = "blue")
+
+#both the datasets are relatively very spread out, and a general line of best fit cannot be placed to accurately represent the data. Describes a uniform distribution as all the data points are very spread out, and not shaped like a bell curve (which would be a normal distribution). 
+```
+
+
+
+<span style="color:green">
+2. Based on your knowledge about `runif()`, what does the command `rnorm()` do? Try plotting TWO different datasets (each data set should have two variables) of 75 number pairs drawn from the normal distribution in DIFFERENT colors and show the commands you used in your script. Comment briefly on the distribution of the two datasets relative to each other.</span>
+
+<span style="color:blue">The command rnorm(n) takes a normal distribution and returns a sample of n random numbers.</span>
+```{r}
+first<-rnorm(75)
+second <- rnorm(75)
+third <- rnorm(75)
+fourth <- rnorm(75)
+
+plot(first,second, col="red")
+points(third,fourth, col = "blue")
+
+#both the datasets are still relatively spread out, but with the use of the rnorm command, the data points are closer together than with the use of the runif command.  This describes a normal distribution(shape of a bell curve, which explains why the data points are a lot more closer together). 
+```
+
+
+Another plotting function in R is `hist()` (introduced in last week's lab), which takes in one numerical vector and plots a histogram. 
+
+<span style="color:green">
+3. Use `hist()` to create histograms for a vector consisting of 9 numbers generated from the uniform distribution. Be sure each axis has a sensible label and the plot has an appropriate title. Next, create 3 more histograms for vectors consisting of 90, 900, and then 9000 numbers generated from the uniform distribution. How does the distribution change as you increase the numbers?</span>
+
+```{r}
+dataSetOne <- runif(9)
+hist(dataSetOne, main="Histogram of 9 Random Data Points from Uniform Distribution", xlab="Random Numbers", col="blue")
+
+dataSetTwo <- runif(90)
+dataSetThree <- runif(900)
+dataSetFour <- runif(9000)
+
+hist(dataSetTwo, main="Histogram of 90 Random Data Points from Uniform Distribution", xlab="Random Numbers", col="green")
+hist(dataSetThree, main="Histogram of 900 Random Data Points from Uniform Distribution", xlab="Random Numbers", col="pink")
+hist(dataSetFour, main="Histogram of 9000 Random Data Points from Uniform Distribution", xlab="Random Numbers", col="red")
+
+# as you increase the numbers, the frequency of each bar increases. Shape of the histogram stays relatively similar as you increase the parameter of runif. You can say that uniformity increases as you increase the numbers. 
+```
+
+
+<span style="color:green">
+4. Repeat question 3 for numbers generated from the normal distribution. </span>
+
+```{r}
+
+dataSetOne <- rnorm(9)
+hist(dataSetOne, main="Histogram of 9 Random Data Points from Normal Distribution", xlab="Random Numbers", col="blue")
+
+dataSetTwo <- rnorm(90)
+dataSetThree <- rnorm(900)
+dataSetFour <- rnorm(9000)
+
+hist(dataSetTwo, main="Histogram of 90 Random Data Points from Normal Distribution", xlab="Random Numbers", col="green")
+hist(dataSetThree, main="Histogram of 900 Random Data Points from Normal Distribution", xlab="Random Numbers", col="pink")
+hist(dataSetFour, main="Histogram of 9000 Random Data Points from Normal Distribution", xlab="Random Numbers", col="red")
+
+# as you increase the numbers, the frequency of each bar still increase, and the histogram becomes more and more symmetric. You can say that as you increase the numbers, the histogram gets more and more close to a perfect normal distribution.
+```
+
+
+Remember what you have learned here, as we'll be performing more plotting later in lab!
+
+## Sampling from distributions
+
+The file *protein_data.csv*, which is provided to you in the downloaded lab file, contains the length of the amino acid chain for all the known protein structures with sequence percentage identity of less than 25% (i.e. dissimilar proteins).
+
+<span style="color:green">
+5. This protein data was obtained from the Protein Data Bank (PDB) at <http://www.rcsb.org/pdb/home/home.do>. Follow this link to find the number of distinct protein sequences the database contains and the number of human sequences it contains (hint: you can find this information on PDB's homepage) and provide the number below.
+\span
+
+<span style="blue">The number of distinct protein sequences is 139,631 and the number of human protein sequences is 39,209, according to a pie chart on the website link above.</span>
+
+Just as you did in week 2, go to the session tab and set your working directory to the folder you saved the file in. If it is in the same folder, then you can set your working directory the the Source File Location. We need to read the *protein_data.csv* file into R with the `read.csv()` function and **assign it to a variable**. Let's name the data set `proteinData`. This command will look like:
+
+```{r}
+proteinData <- read.csv("protein_data.csv", header = TRUE, stringsAsFactors = FALSE)
+
+```
+
+This command tells R to read the csv (comma separated value) file that we have saved in our working directory. The parameter `header = TRUE` tells R that the first row of the file just has the names of the variables and should be treated as a header, not as actual data. The parameter `stringsAsFactors = FALSE` tells R to load in columns with character data as familiar character vectors instead of as a compressed format called a factor. We will examine factors later on.
+
+The data gets loaded into R as an object called a **data frame**. A data frame is like a vector in that it can store many pieces of data under one variable name, but it differs in a few key ways. First, a data frame is a **multi-dimensional array**, which means that instead of just having its elements arranged in a single line, **a data frame can have multiple rows and columns**. We can inspect the structure of our new object by using the function `head()` to print the first six rows of `proteinData` to the console:
+
+```{r comment = ""}
+head(proteinData)
+```
+ 
+From this output, we can see that proteinData is structured as an array of two columns, which are labeled "protein.IDs" and "length". A few useful functions for data frames are `nrow()` and `ncol()`. Supplying these commands with a data frame as their argument will return the number of rows and columns in that data frame, respectively. For example
+
+```{r comment = ''}
+ncol(proteinData)
+```
+
+<span style="color:green">
+6. How many rows does the data frame `proteinData` contain?
+</span>
+```{r}
+print(paste("The data frame contains",nrow(proteinData),"rows."))
+```
+
+
+We can see the names of the columns from our `head()` output above, but to obtain the column names as a manipulable character vector, we can use the command `colnames()`. For our data frame:
+
+```{r comment = ''}
+colnames(proteinData)
+```
+
+This tells us that our data frame has two columns, one containing the protein IDs and the other containing the length of the protein (corresponding the the number of amino acid residues in the protein).
+
+Here's a histogram of all the protein lengths. 
+
+```{r comment = '', echo = FALSE}
+hist(proteinData$length, main = "Histogram of Protein Lengths", xlab = "Length (AA)")
+```
+
+
+<span style="color:green">
+7a. Describe the distribution of the histogram above. </span>
+<span style="color:blue">This is a normal distribution of data. It is asymmetric and positively skewed.</span>
+
+<span style="color:green">
+b. Next, reassign the data from the `length` column in the `proteinData` data frame to a vector called `proteinDataVec`. Use the built-in function `length()` to show that the new vector contains the same number of elements as `proteinData` contains rows (show your commands).</span>
+
+```{r}
+proteinDataVec <- proteinData$length
+
+if (length(proteinDataVec) == nrow(proteinData)){
+  print("Same value obtained!")
+}else{
+  print("Same value NOT obtained!")
+}
+
+```
+
+
+<span style="color:green">
+8. What is the mean residue length of all of the proteins (i.e. the true mean of the population)? What is the standard deviation of the protein population? What is the range of the protein population (use your function from Lab 2)?
+</span>
+
+```{r}
+#COPIED MY FUNCTION FROM LAB 2 HERE.
+myRange <- function(vec){
+  answerVec <- c(min(vec),max(vec))
+  return(answerVec)
+}
+
+print(paste("True mean of the population:",mean(proteinData$length)))
+print(paste("Standard Deviation of the Protein:",sd(proteinData$length)))
+ans<- myRange(proteinData$length)
+print(paste("Range of the protein population:",ans[1],"to",ans[2]))
+
+```
+
+
+## Standard error
+
+The Standard error (estimate) of the mean is used to estimate the standard deviation of the sampling distribution, or in other words the precision of the measurement. $$SE = \frac{S}{\sqrt{n}}$$
+where S is the sample standard deviation and n is the size of the dataset.
+
+<span style="color:green">
+9. Write a simple function that takes in a dataset (a numeric vector) and a sample size and returns the standard error of the sample. You may use the built-in function `sd()` within your own function.</span>
+
+```{r}
+stError <- function(vec){
+ return(sd(vec)/length(vec))
+}
+```
+
+
+Next, we're going to learn how to write some code in R that will take samples from `proteinDataVec` and compare our samples to the actual population. Take a look at the example code below:
+
+```{r comment = ''}
+vectorOfInterest <- c(1:1000)
+sampleSize <- 10
+nTrials <- 1000
+
+funkySampler <- function(dataset, sample, n){
+    results <- numeric(n)
+    for(i in 1:n){
+        vectorSample <- sample(dataset, sample)
+        results[i] <- mean(vectorSample)
+    }
+    return(results)
+}
+
+dist <- funkySampler(vectorOfInterest, sampleSize, nTrials)
+
+hist(dist)
+mean(dist)
+```
+
+**Please read the following section carefully and make sure that you understand** 
+
+Let's break this code down. In this specific example, our vector of interest that we will be sampling is just a vector containing the integers between 1 and 1000 (later on, our vector of interest will be `proteinDataVec`). We have set the sample size (`sampleSize`) to be 10, and the number of trials (`nTrials`) is 1000; this means that we will be taking 1000 samples, each of size 10. 
+
+Next, we define a new function called `funkySampler()` that will perform our desired calculations. In our function declaration, we say that `funkySampler()` is a function of three arguments: dataset, sample, and n, which correspond to our vector of interest, our sample size, and the number of trials, respectively. Within our fuction, the first thing that we do is to define our `results` vector. To see what the `numeric()` command does, try typing `numeric(10)` into the console. This just returns a vector with 10 zeroes, so in our case, `results` is a vector with 1000 (`n`) zeroes. It is important that we set or *preallocate* a "blank vector" `results` before the for loop, otherwise R wouldn't know where to store our new values.  The for loop iterates from `1` to `n`, in this case this is 1 to 1000. In the next line of code, `sample(dataset, sample)` is a command that randomly picks 10 (the `sample`) items from our `dataset`. Next, we take the mean of the values in our sample and store it in the ith position of the results vector. **Notice that as we progress through the for loop, all of the zeros in the results vector are being replaced by the mean of the sample we are taking. The blank vector is being filled in.** After the results vector has been fully populated (after the for loop has finished executing), we return the now-complete results vector.
+
+We call the function using the parameters we defined above, and store it in a variable called `dist`. Finally, we plot a histogram of the results and calculate the mean.  
+
+Use `proteinDataVec` and the function given above (remember to give the function appropriate arguments) to perform the following tasks and answer the following questions.
+
+<span style="color:green">
+10. Use the function above to simulate sampling `proteinDataVec`. Run simulations with sample sizes of 9, 90, 900, and 9000. The number of trials should be kept at 900 for each simulation. For each simulation, plot the results in a histogram and find the mean of the results vector. Show your histograms and means below. </span>
+
+
+```{r}
+#preset paramaters for each simulation: 
+size1 <- 9
+size2 <- 90
+size3 <- 2.00
+size4 <- 9000
+trials <- 900
+
+firstSim <- funkySampler(proteinDataVec,size1,trials)
+secSim <- funkySampler(proteinDataVec,size2,trials)
+thirdSim <- funkySampler(proteinDataVec,size3,trials)
+fourthSim <- funkySampler(proteinDataVec,size4,trials)
+hist(firstSim,main="Histogram of First Simulation (Sample Size = 9)",col="blue", xlab="Protein Sample Mean Lengths")
+hist(secSim,main="Histogram of Second Simulation (Sample Size = 90)",col="green", xlab="Protein Sample Mean Lengths")
+hist(thirdSim,main="Histogram of Third Simulation (Sample Size = 900)",col="red", xlab="Protein Sample Mean Lengths")
+hist(fourthSim,main="Histogram of Fourth Simulation (Sample Size = 9000)",col="yellow", xlab="Protein Sample Mean Lengths")
+
+print(paste("Mean of First Simulation:",mean(firstSim)))
+print(paste("Mean of Second Simulation:",mean(secSim)))
+print(paste("Mean of Third Simulation:",mean(thirdSim)))
+print(paste("Mean of Fourth Simulation:",mean(fourthSim)))
+```
+
+
+<span style="color:green">
+11. Considering each simulation in question 10, describe how the distribution of the results changes as the sample size changes.
+</span>
+
+<span style="color:blue">As the sample size increases, the distribution becomes more and more symmetric and less skewed. In the lowest sample size, the distribution is very positively skewed, but by the third simulation the distribution is symmetric and has no skew.</span>
+
+<span style="color:green">
+12. For each simulation from question 10, how do the means of your samples compare to the population mean of `proteinDataVec`?
+</span>
+
+<span style="color:blue">The true mean of the population calculated above is 545.39423967401. The means of our samples are very close to this value. All the calculated means were within 4.0 units away from the true mean calculated above.</span>
+
+<span style="color:green">
+13. Repeat the tasks in question 10, but this time vary the number of trials while keeping the sample size constant at 90. What happens to the mean of our samples as the number of trials increases compared to the mean for the entire population?
+</span>
+
+```{r}
+size1 <- 9
+size2 <- 90
+size3 <- 900
+size4 <- 9000
+trials <- 90
+
+firstSim <- funkySampler(proteinDataVec,trials,size1)
+secSim <- funkySampler(proteinDataVec,trials,size2)
+thirdSim <- funkySampler(proteinDataVec,trials,size3)
+fourthSim <- funkySampler(proteinDataVec,trials,size4)
+hist(firstSim,main="Histogram of First Simulation",col="blue", xlab="Protein Sample Mean Lengths")
+hist(secSim,main="Histogram of Second Simulation",col="green", xlab="Protein Sample Mean Lengths")
+hist(thirdSim,main="Histogram of Third Simulation",col="red", xlab="Protein Sample Mean Lengths")
+hist(fourthSim,main="Histogram of Fourth Simulation",col="yellow", xlab="Protein Sample Mean Lengths")
+
+print(paste("Mean of First Simulation:",mean(firstSim)))
+print(paste("Mean of Second Simulation:",mean(secSim)))
+print(paste("Mean of Third Simulation:",mean(thirdSim)))
+print(paste("Mean of Fourth Simulation:",mean(fourthSim)))
+```
+
+
+<span style="color:green">
+14. Which one is more important in obtaining a better precision, the number of trials or the sample size? Explain.
+</span>
+
+<span style="color:blue">If you have a very small sample size, your precision error is going to be high, doesn't matter how many trials you do. But if you pick a large sample, you should get a value very close to the true mean of the population. Thus, sample size is more important, because when you keep the number of trials constant and change the sample size, the histograms get a lot of error in their precision.</span>
+
+<span style="color:green">
+15. Modify your function so that instead of finding the mean for each trial inside the for loop, calculate the standard error (estimate) for each trial using your function from question 8. Run simulations using the sample sizes and the number of trials from question 10. For these simulations, each item in the results vector is the standard error for one of the samples we took from the population. Find the mean of the results vector for each sample size and plot a histogram for each case; descibe the pattern.  
+```{r}
+vectorOfInterest <- c(1:1000)
+sampleSize <- 10
+nTrials <- 1000
+
+funkySamplerTwo <- function(dataset, sample, n){
+    results <- numeric(n)
+    for(i in 1:n){
+        vectorSample <- sample(dataset, sample)
+        results[i] <- stError(vectorSample)
+    }
+    return(results)
+}
+
+size1 <- 9
+size2 <- 90
+size3 <- 900
+size4 <- 9000
+trials <- 900
+
+firstSim <- funkySamplerTwo(proteinDataVec,size1,trials)
+secSim <- funkySamplerTwo(proteinDataVec,size2,trials)
+thirdSim <- funkySamplerTwo(proteinDataVec,size3,trials)
+fourthSim <- funkySamplerTwo(proteinDataVec,size4,trials)
+hist(firstSim,main="Histogram of First Simulation w/ St Error",col="blue", xlab="Protein Sample St. Error Lengths")
+hist(secSim,main="Histogram of Second Simulation w/ St Error",col="green", xlab="Protein Sample St. Error Lengths")
+hist(thirdSim,main="Histogram of Third Simulation w/ St Error",col="red", xlab="Protein Sample St. Error Lengths")
+hist(fourthSim,main="Histogram of Fourth Simulation w/ St Error",col="yellow", xlab="Protein Sample St. Error Lengths")
+
+print(paste("Mean of First Simulation:",mean(firstSim)))
+print(paste("Mean of Second Simulation:",mean(secSim)))
+print(paste("Mean of Third Simulation:",mean(thirdSim)))
+print(paste("Mean of Fourth Simulation:",mean(fourthSim)))
+```
+
+
+
+<span style="color:green">
+16. What happens to the mean of the standard errors as the sample size increases?
+</span>
+<span style="color:blue">The mean of the standard errors drops almost exponentially as the sample size increases.</span>
+
+## Data Frames and Factors
+
+Let's take a look at how our data needs to be formatted for proper statistical analyses. R has a set of built-in datasets, and we will be using one of them for this next section of the lab. To see R's built-in datasets, we can execute the following command in the console.
+
+```{r eval = FALSE}
+data()
+```
+
+Here we are looking for a data frame loaded into the variable `PlantGrowth`. As you learned last week, data frames are essentially tables that store information about each of our variables. Let's take a look at its contents. Type the following command into your console. 
+
+```{r comment = ""}
+PlantGrowth
+```
+
+This shows the contents of `PlantGrowth`: one column for the plant weight, and one column for the group the plant was in (control, treatment 1, and treatment 2).
+
+First, let's determine the data types that are contained in PlantGrowth. The R function `class()` will return the data type of the argument it is given. For example,
+
+```{r comment = ''}
+class(7)
+class(TRUE)
+class(seq(1, 5, 0.1))
+```
+
+So even if a vector is passed to `class()`, it will return the data-type that the vector contains.
+
+Now let's apply the same function on the columns of our `PlantGrowth` data frame:
+
+```{r comment = ''}
+names(PlantGrowth)
+class(PlantGrowth$weight)
+class(PlantGrowth$group)
+```
+
+So what is a factor? Factors are a way to represent categorical variables in R, particularly in data frames. In `PlantGrowth` each row contains the weight of a plant (a numeric value) as well as the group to which that plant belongs (a factor). In this case, the factors are the control group (`ctrl`), the first treatment group (`trt1`), and the second treatment group (`trt2`). Factors make it easy to store data from multiple groups in the same data frame. Note that factors are very important for performing many analyses in R!
+
+<span style="color:green">
+17. The command to make a boxplot in R is: 
+
+```{r eval = FALSE}
+boxplot(response variable ~ explanatory variable)
+```
+</span>
+
+<span style="color:green">
+Make a box plot using plant growth data frame where `weight` is the response variable and `group` is the categorical explanatory variable. Title the graph "Boxplot of Dataset PlantGrowth" and label the x and y axes "Treatment Method" and "Plant Weight", respectively (this is similar how we added labels and titles for histograms and scatter plots).
+</span>
+
+```{r}
+boxplot(PlantGrowth$weight ~ PlantGrowth$group, main="Boxplot of Dataset PlantGrowth", xlab="Treatment Method",ylab ="Plant Weight")
+```
+
+ 
+<span style="color:green">
+18. Describe the different descriptive statistics captured by the boxplot. What do the whiskers represent? The box? The dark line within the box? Which treatment seems more effective?</span>
+
+<span style="color:blue">Median (the value separating the higher half and lower half of a population or sample) First Quartile (median of lower half of data), Third Quartile (median of upper half of data), Minimum (lowest value within 1st quartile - IQ Range(1.5)), Maximum(highest value within 3rd quartile + IQ Range(1.5)), the InterQuartile Range (3rd quartile - 1st quartile), Outliers(values outside of the maximum and minimum). Whisker's are the lines extending from the boxes (3rd and 1st quartiles). They are used to indicate variability outside the lower and upper quartile.</span>
+
+We can execute functions over data assigned to factors by using the `aggregate()` function. This is particularly useful when we want to obtain summary data such as the mean.
+
+```{r comment = ''}
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=sd)
+```
+
+
+The `aggregate` command divided our data table into the control, treatment 1, and treatment 2 groups and found the mean plant weight separately for each group. The `FUN` parameter is used to specify which R function should be executed. For example, if we want to calculate the variance (`var()`)  rather than the mean we can simply execute: 
+
+```{r comment = ''}
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=var)
+```
+
+<span style="color:green">
+19. Use the `aggregate` function to calculate the range, standard deviation and standard error for each of the groups in `PlantGrowth`.
+</span>
+
+```{r}
+
+
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=sd)
+aggregate(PlantGrowth$weight, by=list(PlantGrowth$group), FUN=stError)
+```
+
+
+
+
+
+
+
+## Review
+
+| Operation               | Syntax in R                                         |
+|:------------------------|:----------------------------------------------------|
+|Sample n random numbers between 1 and 0 from the uniform distribution | `runif(n)` | 
+|Sample n random numbers from the normal distribution |` rnorm(n)`| 
+|Plot `y` as a function of `x` |`plot(x,y)`| 
+|Histogram | `hist(x)`|
+|Number of columns in data frame |`ncol(dataframe)`|			
+|Number of rows in data frame | `nrow(dataframe)	`|
+|Create a vector with n zero entries |`numeric(n)`|
+|Class of a variable | `class()` |
+|Box plot | `boxplot(response variable ~ explanatory variable)`	| 
+|Variance | `var()` | 
+|Execute a function for individual factors | `aggregate() ` |
+
+## Lab 3 Homework
+
+For all of the problems below you should use RStudio to answer the questions in this document. Please show all of your commands to read the data, plot and perform analysis. The homework is due one week after your lab day at 1:30pm on Chalk. 
+
+## Confidence Intervals from a normal distribution
+
+As you will learn in lecture, confidence intervals help us gauge the reliability of an estimate. Assuming we have an estimate of the mean and standard deviation of a population, for a normal distribution we can calculate the 95% confidence interval as follows:
+
+```{r comment = ''}
+sampleMean <- 10
+SD <- 3
+n <- 30
+error <- qnorm(0.975) * SD / sqrt(n)
+lower <- sampleMean - error #lower value of the 95% confidence interval
+upper <- sampleMean + error # upper value of the 95% confidence interval
+CI95 <- c(lower, upper)
+CI95
+```
+
+We'll talk more about the command `qnorm()` in a later lab, but for now what you need to now is that `qnorm(0.975)` gives the x-value for which the area under the standard normal distribution is 97.5% of the total area under the curve (which is 1).
+
+```{r comment = ''}
+qnorm(0.975)
+```
+
+![](./Images/qnorm_image.png)
+
+<span style="color:green">
+1. Why did we use `qnorm(0.975)` instead of `qnorm(0.95)` to find the 95% confidence interval?
+</span>
+
+<span style="color:green">
+2. Use the code above to write a function for the 90% confidence interval. Use this function and the `aggregate()` command to calculate the 90% confidence interval for each of the groups in `PlantGrowth` data.
+</span>
+
+<span style="color:green">
+3. Modify your function from question 21 to write a function for the 99% confidence interval. Calculate the 99% confidence interval for all the groups in `PlantGrowth`. Compare to the 90% confidence intervals, which one is smaller? Why?</span>
+
+<span style = "color:green"> 
+4. We're going to take another look at the dengue DNA sequence that we started analyzing for lab 1. After setting your working directory to the folder where you have saved the dengue sequence file, run the following commands in R: </span>
+
+```{r}
+library('seqinr')
+dengue <- read.fasta(file = 'dengue_seq.txt')
+dengue_vec <- as.vector(dengue[[1]])
+```
+
+<span style = "color:green"> 
+(a) Write a **single function** called `GC_content` that takes in a sequence and calculate the GC content of the sequence. You can refer to your code from homework 1 for help, but make sure your final code is written as a function.</span>
+
+<span style = "color:green">
+(b) Recall our sampling function `funkySampler()` given in the lab above. Modify the function so that, for each sample that you take, you use your function from part (a) to calculate the GC-content of that sample (note that we will now be sampling from a character vector). Return the vector of these sample GC contents. Write your function below.</span>
+
+<span style = "color:green">
+(c)  Use your code from part (b) and perform four different simulations where you sample from `dengue_vec` using a sample size of 9, 90, 900, and 9000. Keep the number of trials at 900 for each simulation. For each simulation, plot a histogram of the results vector and calculate the mean of the results vector. Describe how the distribution of the results changes as the sample size changes.</span>
+
+<span style = "color:green">
+(d) For each simulation, how do the means of your samples compare to the GC-content for the dengue DNA sequence as a whole?</span>
+
+<span style="color:green">
+5. Read data from the file *MeaslesOutbreaks.csv* into R with the `read.csv()` command. Choose an appropriate variable name for this command. This data comes from Example 2.4A in the Whitlock Schluter textbook. </span>
+
+<span style="color:green">
+(a) Use the `plot()` command you learned in lab to plot a graph using `yearByQuarter` as the explanatory variable and `confirmedCases` as the response variable. Make sure to include axis labels and a title.</span>
+
+<span style="color:green">
+(b) Add the parameter `type="l"` to your `plot()` command from part (a). How does this change your graph?</span>

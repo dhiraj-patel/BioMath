@@ -1,0 +1,241 @@
+---
+title: "Lab 2 Functions in R"
+output: html_document
+---
+
+###<span style="color:green">This assignment is due at 11:59 p.m. the day of lab.\span
+
+<span style="color:red">Please submit your lab report by renaming this R Markdown file as "Lab2LastnameFirstname.Rmd" **(please replace Lastname and Firstname with your last and first names, respectively; please do not add spaces, hyphens, or underscores)** and uploading it to the appropriate Lab 2 submission link on Chalk. Please provide answers in this document in the form of <span style="color:blue">blue text</span> and
+```{r eval = FALSE}
+code chunks #with comments when necessary
+```
+<span style="color:red">to all green questions. </span>
+
+## Functions in R
+
+When we program, we often want to repeat particular tasks many times. In last week's lab you learned how to implement for loops. However, sometimes the task we want repeated occurs sporadically throughout our code. For these situations, a good solution in R (or realistically any programming language) is to write a function. **Functions are a chunk of code designed to do a specific task.** In order to utilize a function you call it by name and, when necessary, provide that function with arguments, which are the data that you pass to the function. We've already encountered a built-in R function last week in Lab 1, called `sum()`. If you remember, this function summed all of the numbers input into the function. For example, `sum(2:6)` is equivalent to `2+3+4+5+6`.
+
+There are lots of built-in functions already on R that we will learn about, but we can also write our own. Say we want to write a function that will return the square of any number it is given.
+
+
+```{r comment = ''}
+getSquare <- function(num){
+  result <- num * num
+  return(result)
+}
+getSquare(4)
+getSquare(8)
+```
+
+Let's take a closer look: In R, all functions follow the same basic architecture (pseudocode follows):
+
+```{r eval = FALSE}
+functionName <- function(argument1, argument2, ..., argumentN){
+  ...operations performed on arguments...
+  return(output)
+}
+```
+
+In the `getSquare` example, by using `function()`, we are telling R that we want to create a function called `getSquare` that takes a single input argument `num`. Inside the curly brackets we define what we'd like that function to do. In the example above, we square `num` and assign it to a variable `result`. We then tell the function to `return()` our variable `result`. `return()` indicates the end of the function and will output to the console whatever is inside of its parentheses. **Any code placed after a return() statement will not run - the return statement will mark the end of the function.** If you play around with functions in R you may notice that they do not always need to contain a return statement. However, for the sake of this course, always be explicit and use return statements in your functions to make your functions output what you want them to output!
+
+<span style="color:green">
+1. Write a function that takes a single numerical argument, prints that number, and then returns that number to the fourth power. Then, use this function to calculate 89 to the fourth power.</span>
+
+```{r}
+myFunc <- function(param){
+  print(param)
+  ans <- (param^4)
+  return(ans)
+}
+myFunc(89)
+```
+
+Functions are not limited to operations upon a single input number of variable. Instead, they can take multiple arguments, as in the following `multipleArgFunction()` example. 
+
+```{r comment = ''}
+multipleArgFunction <- function(numA, numB, numC){
+  answer <- numA * numB + numC
+  return(answer)
+}
+multipleArgFunction(1, 2, 3)
+```
+
+**Note that order of the arguments matters!** See what happens below when we reverse the numbers:
+
+```{r comment = ''}
+multipleArgFunction(3, 2, 1)
+```
+
+As we can see, the first argument passed to `multipleArgFunction` is assigned to variable `numA`, the second to variable `numB`, and the third to variable `numC`.
+
+It is possible to circumvent the rule that inputs must be given in a particular order to correspond to particular variable. For example, it is possible to make the input for `numA` in `multipleArgFunction` the third input value instead of the first. This is done by using a single equal sign (`=`) in the function input. For example:
+
+```{r comment = ''}
+multipleArgFunction(numC = 3, numB = 2, numA = 1)
+```
+
+This produces the same output as 
+
+```{r comment = ''}
+multipleArgFunction(1, 2, 3)
+```
+
+As an aside: Functions do not necessarily require input arguments in order to work. For example: 
+
+```{r comment = ''}
+noInputFunc <- function(){
+  return("It works!")
+}
+noInputFunc()
+```
+
+Suppose we wanted a plot of our function. We can do this with the `plot()` command. Try making the following adjustment to our `getSquare` function so that it takes in an argument of a vector of numbers.
+
+```{r comment = ''}
+getSquare <- function(vec){
+  y <- vec * vec
+  plot(y)
+}
+getSquare(-10:10)
+```
+
+This time, when we run the last line of code, our function returns a plot of the square of all the integers between -10 and 10. 
+
+<span style="color:green">
+2. Write a function that calculates the reciprocal (i.e. 1/x) of a vector argument multiplied by five and then 'returns' a plot of this vector. Execute this function for a vector containing integers between -2 and 12.</span>
+
+```{r}
+recip <- function(paramVec){
+  y <- 1/(5*paramVec)
+  plot(y)
+}
+recip(-2:12)
+```
+
+
+The following built-in functions might be helpful for questions 3 and 4:
+
+* `max()` returns the largest item in a vector (i.e. `max(c(1, 2))` returns 2)
+* `min()` returns the smallest item in a vector (i.e. `min(c(1, 2))` returns 1)
+* `length()` returns the number of items in a vector (i.e. `length(1:4)` returns 4)
+* `sqrt()` returns the square root of its vector argument (i.e. `sqrt(4)` returns 2)
+* `seq(x, y, by=z)` gives all the numbers between `x` and `y` with interval `z`. For example, try the command `seq(1, 10, 0.5)`. If you set `z = 1`, this is equivalent to the command `x:y`.
+
+<span style="color:green">
+3. Write a function called `myRange` that takes in a numeric vector and returns the smallest and largest integer in a new vector (i.e. for the integers in the following sentence, the function should return a vector with a 1 and a 20. Execute that function on a vector containing the integers: 5, 20, 4, 2, 1, and 17 (in that order). Does your answer match R's built-in function `range()`? (hint: there is a very long way and a very short way to do this, the short way using some of the functions listed above).</span>
+
+
+```{r}
+vtest<-c(5, 20, 4, 2, 1,17)
+myRange <- function(vec){
+  answerVec <- c(min(vec),max(vec))
+  return(answerVec)
+}
+myRange(vtest)
+# long way to do this is using a for loop to go through the vector to find largest and smallest integer value, but using the built-in functions its easier. 
+#This matches R's built-in range function. Range probably uses max/min or a for loop in their function 
+```
+
+
+
+<span style="color:green">
+4. Below is the formula for calculating the standard deviation of a sample. Standard deviation is one of the methods of measuring the variation of a sample (we will learn more about this in the lecture). Translate this formula into an R function that returns the standard deviation of a vector of numbers. Execute this function on a vector 1 through 120 with step size of 0.5. When $n$ is the number of data points, $x_i$ is each of the values of the data, and $\bar{x}$ is the mean of the $x_i$, the standard deviation is given by: $$s_x = \sqrt{\frac{\sum_{i=1}^n(x_i-\bar{x})^2}{n-1}}$$</span>
+
+
+```{r}
+testVec <- (seq(1,120,0.5))
+stdev <- function(vec){
+  vecLength <- length(vec)
+  answer <- sqrt(sum((vec - mean(vec))^2) / (vecLength - 1))
+  return(answer)
+}
+stdev(testVec)
+```
+
+
+<span style="color:green">
+5. Check the results of your standard deviation function using R's built-in function `sd()`. Are there differences in the values that your function and built-in R function returns? Write a logical statement to determine whether the values each function returns are equal.
+
+```{r}
+if(sd(testVec)==stdev(testVec)){
+  print("There is no difference in the values given by my function and the built-in R function")
+}else{
+  print("There is a difference in the values given by both functions")
+}
+ 
+```
+
+## Reading data into R
+
+Up to this point we've been using arbitrary data for all of our exercises. As you would expect, we can load our own data into R. Get the file *caffeine_jjp.csv* off of Chalk and put in the folder where this lab document is located (this file contains the amount of caffeine in a 16 oz cup of different coffee brands). Now, we want set our working directory in R to our Lab 2 directory so that R is able to locate the file caffeine_jjp.csv. To set your working directory, select "Session" from the Rstudio drop down menu and select "Set Working Directory -> To Source File Location" (if you save a dataset in a folder other than your Lab directory, make sure that you set your working directory to that folder via "Choose Directory..." instead). The following command can now be used to read in our data file: 
+
+```{r}
+myData <- read.csv('caffeine_jjp.csv', header = T, sep = ',')
+```
+
+The variable `myData` is a data frame, the details of which will be discussed in a future lab. However, for now the information you're interested in (the amount of caffeine in a 16 oz cup of coffee), can be accessed by:
+
+```{r comment = ''}
+#WAY TO ACCESS THE AMOUNT OF CAFFEINE IN A 16 OZ CUP OF COFFEE
+myData$Caffeine_mg_in_16_oz_coffee
+```
+
+Notice that the above command returns a vector of numbers from your data frame.
+
+<span style="color:green">
+6. Using the functions that you wrote (not the built-in R functions) for range and standard deviation, calculate the range and standard deviation of the amount of caffeine in the 16 oz cups of coffee included in the dataset.</span>
+
+```{r}
+caffeineStandardDev <- stdev(myData$Caffeine_mg_in_16_oz_coffee)
+caffeineRange <- range(myData$Caffeine_mg_in_16_oz_coffee)
+print(c("caffeine st. dev:", caffeineStandardDev))
+print(caffeineRange)
+```
+
+
+Lastly, R is not just helpful for analyzing data, but for visualizing data as well. During next week's lab we'll spend a good amount of time learning to plot data. You can use the `hist()` command to create a histogram of the caffeine data. The first argument passed in is the data to be plotted, `xlab` gives the plot a label on its x-axis, `col` gives the histogram bars a specific color, and you'll figure out what the `breaks` parameter does in a moment.
+
+```{r}
+hist(myData$Caffeine_mg_in_16_oz_coffee, main="Histogram of Caffeine Content in 16oz Coffee",xlab = 'Caffeine (MG) per 16 oz cup', col = 'violetred', breaks =5)
+```
+
+<span style="color:green">
+7. Inspect the above histogram. What is the mode of your distribution? Change the `breaks` parameter to different values. What does it do to the histogram and the distribution? Try to plot the histogram that best represents the data. </span>
+
+<span style="color:blue">The mode of this distribution is 170. If you change the `breaks` parameter to a higher value, eventually there is a greater number of bars used to represent the data, since breaks is the number of cells for the histogram. So when you increase the breaks parameter to, let us say, 9, then R tries to split the data in a way that it can be represented by 9 cells. The best histogram to represent the data occurs when you set `breaks` equal to 5. If you increase breaks and split the histogram even more then the data is not represented very well.</span>
+
+## Review 
+
+| Operation               | Syntax in R                                         |
+|:------------------------|:----------------------------------------------------|
+|Function                 | `functionName <- function(){}`                      |
+|Number of items in vector| `length()`                                          |
+|Square root              | `sqrt()`                                            |
+| sequence of numbers     | `seq(x, y, by = z)`                                 |
+|Mean                     | `mean()`                                            |
+|Standard deviation       | `sd()`                                              |
+| To read a csv file      | `name <- read.csv('file name', header = T, sep=',')`|
+|Histogram                | `hist()`                                            | 
+
+## Lab 2 Homework
+
+The homework is due next Wednesday before lecture time.
+
+<span style="color:green">
+1. Load the data file called *titanic.csv* into R using methods from the lab. This file contains various data for some of the passengers of Titanic.</span>
+
+<span style="color:green">
+(a) After loading the data into RStudio, click on the corresponding line in the Data section of RStudio's Environment panel (upper right). This should open a table containing various kinds of information. What sort of information is provided?</span>
+
+<span style="color:green">
+(b) Plot a histogram for the age of the passengers (properly label the x axis and color the plot in green). Is the distribution skewed? Try different `breaks` values and use the one that best represent the data.</span>
+
+<span style="color:green">
+(c) Use your own functions you wrote in the lab to calculate the range age of the passengers and the standard deviation.</span>
+
+<span style="color:green">
+2. Write a function to calculate the standard deviation of a vector of numbers using the shortcut formula provided in lecture. Execute this function on a vector 1 through 120 with step size of 0.5. Does your answer match the number you obtained in the lab?</span>
+
+<span style="color:green">
+3. Write a function that takes in your first and last name as separate arguments, and using a SINGLE command (ie only 1 statement), have the function print both separated by a space. Heads up - this is challenging, as you will likely have to do some Google searching to find a function that allows you to do this!
+</span>

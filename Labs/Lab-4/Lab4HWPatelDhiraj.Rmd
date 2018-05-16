@@ -1,0 +1,89 @@
+---
+title: "Lab4HWPatelDhiraj"
+author: "Dhiraj Patel"
+date: "4/25/2018"
+output: html_document
+---
+## Lab 4 Homework
+
+<span style="color:green">
+1. This question is intended to give you a chance to review the `aggregate()` command from lab 3.
+
+`ToothGrowth` is a data frame that tells us about the effect of vitamin C on tooth growth in guinea pigs. The first column, `len` contains information about the length of the tooth. The second column, `supp`, tells you the type of supplement that was given to each guinea pig (vitamin C or orange juice), and the third column, `dose`, tells you the dose of the supplement. 
+
+<span style="color:green">
+a.	Write a command to find the standard deviation of tooth length for the group given vitamin C supplements and for the group given orange juice. </span>
+
+```{r}
+aggregate(ToothGrowth$len,by=list(ToothGrowth$supp),FUN=sd)
+```
+
+
+<span style="color:green">
+b.	Make a boxplot for the ToothGrowth length as a function of the supplement.</span>
+
+
+```{r}
+boxplot(ToothGrowth$len ~ ToothGrowth$supp)
+```
+
+### Bernoulli Trials
+
+A Bernoulli (or binomial trial) is a simulation that has two possible outcomes. The outcomes can be considered as a "success" or a "failure". It is called a Bernoulli trial because it was first formalized by Jacob Bernoulli.
+
+<span style="color:green">
+2.	As you learned in lecture, one easy way to make a null hypothesis distribution is to flip many coins and count the number of outcomes (heads or tails).</span>
+
+<span style="color:green">
+a.	Execute the following code. What does the `round()` function do?
+</span>
+```{r comment = ''}
+vector <- c(0.10, 0.30, 0.67, 0.59, 0.49, 0.50, 0.77)
+round(vector)
+```
+
+<span style="color:blue">The round function takes in a vector here and rounds each element in the vector to the closest integer element.</span>
+
+<span style="color:green">
+b.	Define a variable called `nFlips` (the number of coin flips we want to simulate). For now, set `nFlips` to be 99. To simulate 99 coin flips, use the functions `runif()` and `round()` to return a vector called results consisting of 1's and 0's (**let's say the 1's correspond to the number of heads and the 0's correspond to the number of tails**).</span>
+
+```{r}
+nFlips <- 99
+placeVec <- runif(nFlips)
+results <- round(placeVec)
+results
+sum(results)
+```
+
+
+<span style="color:green">
+c.	What does `sum(results)` tell us about our coin flips?</span>
+
+<span style="color:blue">`sum(results)` will add up all the 1's in the results vector, since adding zero doesnt change the final answer. So, `sum(results)` tells us the number of heads attained from the coin flipping.</span> 
+
+
+<span style="color:green">
+d.	Define an additional variable `nTrials` (the number of trials we will perform the coin tosses). Using what we learned in parts (b) and (c), write a code to simulate 2,000 trials of 20 coin-flips and find the number of heads in each trial. Save the total number of heads you get for each trial in the results vector. You will need a for loop (remember to define an empty `results` vector before the for loop).</span>
+
+
+```{r}
+nTrials <- 2000
+results <- numeric(2000)
+for(i in 1:nTrials){
+  trialResult <- round(runif(210))
+  results[i]<-sum(trialResult)
+}
+#print(results)
+  
+```
+
+
+<span style="color:green">
+e.	Plot a histogram of your results from part (d). How does the distribution change by increasing the number of trials? How does the distribution change when you increase the number of coin flips for each trial? Pay close attention to the scales on the x and y axes when formulating your answer.</span>
+```{r}
+hist(results,xlab="Number of Heads Landed in Trials",ylab="Frequency of Heads",main="Coin Flipping Results")
+# As you increase the number of trials, the distrubtion becomes more and more symmetric. 
+# As you incresae the number of coin flips for each trial, the distrubtion stays relatively the same, but the number of heads landed increases, y-axis scale stays relatively the same, x-axis increases scale.
+```
+
+

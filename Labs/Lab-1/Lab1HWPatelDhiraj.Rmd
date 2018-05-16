@@ -1,0 +1,109 @@
+---
+title: "Lab1HWPatelDhiraj"
+author: "Dhiraj Patel"
+date: "3/26/2018"
+output: html_document
+---
+
+## Lab 1 Homework
+
+The homework is due one-week from your lab time. Please answer the questions in this R Markdown file as in the lab. Call the script "Lab1HWLastnameFirstname.Rmd" and submit it on Chalk before next week's Lab for your T.A. to grade. Remember to comment your code as we did for Lab 1.
+
+We can use the concepts we learned in lab to analyze the contents of a genome sequence. For this homework, you will be analyzing the Dengue virus genome, a virus that causes Dengue fever and is classified as a neglected tropical disease by the World Health Organization. 
+
+The file dengue_seq.fasta on Chalk contains the Dengue DEN-1 DNA sequence. Download this file onto your computer and open RStudio. Select the Session tab on the top of the window, select 'Select Working Directory', and click on 'Choose Directory...'. Choose the folder where you saved the dengue_seq.fasta file. In order to load this data into a vector in R, execute the commands in the first code chunk below in the command prompt (for now you can ignore the syntax, we'll learn more about reading files in a later lab):
+
+```{r eval = FALSE}
+install.packages('seqinr')
+library('seqinr')
+dengue <- read.fasta(file = 'dengue_seq.txt')
+dengue_vec <- as.vector(dengue[[1]])
+```
+
+```{r echo = FALSE, message = FALSE}
+#Silently runs the last 3 commands above for the R Markdown environment
+library('seqinr')
+dengue <- read.fasta(file = 'dengue_seq.txt')
+dengue_vec <- as.vector(dengue[[1]])
+```
+
+The variable `dengue_vec` is a vector consisting of the nucleotide sequence of the Dengue genome. 
+
+<span style="color:green">
+1. Using indexing, find the first 25 nucleotides in the dengue genome.</span> 
+
+```{r}
+#First 25 nucleotides:
+dengue_vec[1:25]
+```
+
+
+<span style="color:green">
+2. Using a **for loop**, find the length of the dengue genome. To do this, outside of the for loop first define the variable `length <- 0`. Then with a for loop, iterate over each element of `dengue_vec`, and with each iteration add 1 to `length`.</span>
+
+```{r}
+length <- 0
+for(i in dengue_vec){
+  length <- length + 1
+}
+print(length)
+```
+
+<span style="color:green">
+3. Using a **for loop** and an **if statement**, find the number of "c" nucleotides in the dengue genome. Hint: this is similar to question 2, but with an added if statement. </span>
+
+```{r}
+tides <- 0
+for (i in dengue_vec){
+  if(i=="c"){
+    tides <- tides + 1
+  }
+}
+print(tides)
+```
+
+
+<span style="color:green">
+4. Using a **for loop** and an **if statement** find the number of "g" nucleotides in the dengue genome.</span>
+
+```{r}
+gtides <- 0
+for (i in dengue_vec){
+  if(i=="g"){
+    gtides <- gtides + 1
+  }
+}
+print(gtides)
+```
+
+
+<span style="color:green">
+5. One fundemental property of a genome sequence is its GC content, the fraction of Gs and Cs in the nucleotide sequence: $$\text{GC Content} = \frac{\#Gs + \#Cs}{\text{length of sequence}}\times 100.$$ Using your answers from questions 2, 3, and 4, calculate the GC content for the Dengue genome.</span>
+
+```{r}
+gccontent <- ((gtides + tides)/(length))*(100)
+print(gccontent)
+```
+
+
+<span style="color:green">
+6. Research built-in functions in R. Successfully execute 5 functions that were not explicitly covered in this lab. Through comments in your code, briefly describe what the function does.</span>
+
+```{r}
+#1 The Absolute Value function finds the absolute value of the inputted number
+abs(-0.3)
+
+#2 The exp function finds the answer of e raised to the inputted paramater. Here it will find e^2
+exp(2)
+
+#3 toupper function will uppercase the letters in a given string
+toupper("hello")
+
+#4 tolower function will lowercase the letters in a given string
+tolower("BIOLOGY")
+
+#5 max(x) will find the max value in a given vector.
+x <- c(10,20,30,40)
+max(x)
+```
+

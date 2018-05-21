@@ -293,11 +293,10 @@ A<- (10^(-1*7))
 B<-10
 k<-(-1*0.000052)
 expDecayNeuro <-((A*exp((-1*k)*(xlabvar)))+B)
-plot(xlabvar,expDecayNeuro,xlab="Neuron Number",ylab="Memory Used in GB",col="blue")
-
-
+plot(NeuroComputation$numberOfNeurons,NeuroComputation$memoryInGB,col="red",xlab="Neuron Number",ylab="Memory Used in GB",type="o")
+lines(xlabvar,expDecayNeuro,col="blue")
 lines(xlabvar,quadModPredicted,col="black")
-
+# The quadratic fit works better, you can see that the red and black lines overlap, which means the predicted values are very close to the actual values, whereas the exponential fit line varies significantly from the actual values. The actual values are shown in red 
 ```
 
 
@@ -305,13 +304,54 @@ lines(xlabvar,quadModPredicted,col="black")
 14.	 Let `Vec1` be a numeric vector from 0 to 40 with a step size of 0.2. Use the linear function that you wrote in Question 9 to produce a vector `Vec2` using `Vec1` vector as the input. Then perform a linear regression with the command `lm()` to generate a linear model (`Vec1` should be the explanatory variable and `Vec2` should be the response variable) . Does it return the correct slope and intercept with $R^2 = 1$?
 </span>
 
+```{r}
+Vec1<-seq(0,40,0.2)
+A<-10
+B<-25
+Vec2<-((A*Vec1)+B)
+linFitFourteen <- lm(Vec2 ~ Vec1)
+linFitFourteen
+summary(linFitFourteen)
+#this model returns the correct slope and intercept, and an R squared value of 1.0!!!! "essentially perfect fit!"
+```
+
+
 <span style="color:green">
 15.	 Now, generate a vector of random numbers of the same length as `Vec1` (using the function `runif(n = length(Vec1), min = -1, max = 1)`) and multiply this random vector by some scalar value `s`. Add this quantity to the vector `Vec2` and call this new vector `Vec3`. This simulates a data set with noise where the constant `s` denotes the strength of the noise. Starting with a small value of the constant `s`, increase it gradually, and perform linear regression of `Vec3` on `Vec1` (`Vec1` should be the explanatory variable and `Vec3` should be the response variable). How do the best-fit slope and intercept change as the noise strength is increased? How does the $R^2$ value change?
 </span>
 
+```{r}
+lastQuestionsFunction <- function(s){
+  vec3<-runif(n=length(Vec1),min=-1,max=1)
+  vec3<-vec3*s
+  Vec3 <- vec3+Vec2
+  lm(Vec3~Vec1)
+  linFitFifteen<-lm(Vec3~Vec1)
+  print(summary(linFitFifteen)) 
+  return(linFitFifteen)
+}
+lastQuestionsFunction(233234234234)
+#When s is relatively small, the slope and intercept are very very close to the actual values, as you increase s, the variation from the actual values increase more and more, at really high values for s, the slope and intercept are no longer sensical values. The R squared values gets farther and farther awaay from 1.0 and closer and closer to 0.0.
+```
+
+
 <span style="color:green">
 16.	 To visualize the relationship between noise and $R^2$, or the correlation coefficient squared, execute the command `plot(Vec1, Vec3)` for `s`=15, `s`=55, and `s`=550.
 </span>
+
+```{r}
+plotLastOnes <- function(s){
+  vec3<-runif(n=length(Vec1),min=-1,max=1)
+  vec3<-vec3*s
+  Vec3 <- vec3+Vec2
+  return(plot(Vec1,Vec3))
+}
+
+plotLastOnes(15)
+plotLastOnes(55)
+plotLastOnes(550)
+# as you increase s you see that the data points start spreading out from the line of best fit. The smallest s value gives you the closest values. 
+```
 
 ### Correlation
 
@@ -348,31 +388,99 @@ Note that the numbers used here are random, so your own value of `cor()` and the
 17.	Why is the correlation coefficient so small for two random sets of normally distributed samples?
 </span>
 
+<span style="color:blue">The correlation coefficient is so small for two random sets of normally distributed samples because these samples are randomly selected and normally distributed, so there is not a linear relationship and we would not expect there to be a high correlation coefficient value.</span>
+
 Let's investigate this in more detail by repeating the task. Below, you will write functions to sample two vectors of size `x` from a particular distribution and calculate and return the correlation coefficient. Then you can use your functions to simulate a large number of trails.
 
 <span style="color:green">
 18.	Write an R function that takes a numeric value `x` as its argument. Within the function, create two random number vectors of size `x` sampled from a normal distribution. Use `cor()` to calculate the correlation coefficient, and return this value.
 </span>
 
+```{r}
+foo <- function(x){
+  myvec1 <- rnorm(x)
+  myvec2 <- rnorm(x)
+  return(cor(myvec1,myvec2))
+}
+```
+
+
 <span style="color:green">
 19.	With a for loop and the function you wrote for question 18, perform a simulation for 999 trials with each having a sample size of `x`=99. Save the correlation coefficient to a vector, and plot the results of the simulation as a histogram. What does the distribution look like? Is this what you'd expect?
 </span>
+
+```{r}
+x<-99
+placeHolderVec<-numeric(999)
+for(i in 1:999){
+  placeHolderVec[i] <- foo(x)
+}
+hist(placeHolderVec,col="green")
+#This looks like a normal distribution, with the correlation values between -0.3 to 0.3, and this is what we would expect, because since we are running correlation simulations of random values from the normal distribution, all of our correlation values should be around 0.0, since we determined above that the correlation coefficients should be small for two random samples from the normal distribution. 
+```
+
+
 
 <span style="color:green">
 20.	Perform the same task as above, but write a new function that samples random numbers from a uniform distribution. (Hint: use `runif()`). What does the distribution look like? Is this what you'd expect?
 </span>
 
+```{r}
+bar <- function(x){
+  myvec1 <- runif(x)
+  myvec2 <- runif(x)
+  return(cor(myvec1,myvec2))
+}
+x<-99
+placeHolderVecUnif<-numeric(999)
+for(i in 1:999){
+  placeHolderVecUnif[i] <- bar(x)
+}
+hist(placeHolderVecUnif,col="yellow")
+
+#The distribution looks the same because, we are still picking random values from a distribution so the correlation coefficients should still be small
+```
+
+
 <span style="color:green">
 21.	 Perform the same task as above, but write a new function that samples random numbers from the chi-squared distribution (type ?rchisq into the console for the help page for the rchisq() function if needed) for df = 10. What does the distribution look like? Is this what you would expect?
 </span>
+
+```{r}
+chunks <- function(x){
+  myvec1 <- rchisq(x,df=10)
+  myvec2 <- rchisq(x,df=10)
+  return(cor(myvec1,myvec2))
+}
+x<-99
+placeHolderVecChi<-numeric(999)
+for(i in 1:999){
+  placeHolderVecChi[i] <- chunks(x)
+}
+hist(placeHolderVecChi,col="red")
+
+#The distribution looks the same because, we are still picking random values from a distribution so the correlation coefficients should still be small
+```
+
 
 <span style="color:green">
 22.  Overall, what can you expect for the correlation coefficient from a perfectly random sample, regardless of the distribution?
 </span>
 
+<span style="color:blue">When you try to find the correlation coefficient from a perfectly random sample, regardless of the distribution, you should always get small values since you are always picking randomly DOES NOT MATTER WHAT TYPE OF DISTRIBUTION YOU TAKE IT FROM!</span>
+
 <span style="color:green">
 23.	Set `x <- c(rnorm(199,0,1), rnorm(199,10,1))` and `y <- c(rnorm(199,0,1), rnorm(199,10,1))`. Note that `x` and `y` are created completely independently. Plot x against y, compute the correlation coefficient, and briefly discuss your findings. What does this example tell you about how you should interpret correlation coefficients? 
 </span>
+
+```{r}
+x<-c(rnorm(199,0,1),rnorm(199,10,1))
+y <- c(rnorm(199,0,1), rnorm(199,10,1))
+plot(x,y)
+cor(x,y)
+
+#We have to make sure that we know when to use the correlation coefficients. We should only use the correlation coefficients when attempting to analyze the relationship between two sets of data that appear to have a linear relationship; whereas in this example the two sets of data are completely unrelated. 
+```
 
 
 ### Lab 7 Homework

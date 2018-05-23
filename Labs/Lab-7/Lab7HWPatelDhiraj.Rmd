@@ -4,8 +4,6 @@ author: "Dhiraj Patel"
 date: "5/23/2018"
 output: html_document
 ---
-
-
 ### Lab 7 Homework
 
 Due at 1:30 p.m. one week after lab.
@@ -21,18 +19,35 @@ y <- sqrt(0.30) * x + sqrt(0.70)*rnorm(250)
 1.  Plot x against y.
 </span>
 
+```{r}
+plot(x,y,xlab="x variable",ylab="y variable")
+```
+
+
 <span style="color:green">
 a.	What is the correlation coefficient between `x` and `y`? 
 </span>
+
+```{r}
+print(paste("the correlation coefficient is",cor(x,y)))
+```
+
 
 <span style="color:green">
 b.	What is the correlation coefficient squared? Based on this, how much of the value of `y` is predicted by `x`?
 </span>
 
+```{r}
+print(paste("the correlation coefficient squared is",((cor(x,y))^2)))
+#Based on this [ ] of the value of y is predicted by x. 
+
+```
+
+
 In this part we will use data from the paper *Rate of de novo mutations and the importance of father's age to disease risk* (Nature, v.488, pp. 471-475, doi:10.1038/nature11396). The `read.table()` command is like the `read.csv()` command, but it allows us to upload .txt files into R. Load the file *kong_mutation_data.txt* into a data frame:
 
 ```{r eval = FALSE}
-read.table('kong_mutation_data.txt', header=T)
+myFile <- read.table('kong_mutation_data.txt', header=T)
 ```
 
 The first two columns are the paternal and maternal ages, respectively, and the third column is the total number of de novo mutations found in their offspring.
@@ -40,6 +55,13 @@ The first two columns are the paternal and maternal ages, respectively, and the 
 <span style="color:green">
 2.	Plot the number of mutations as a function of paternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `PatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
 </span>
+
+```{r}
+plot(myFile$PatAge,myFile$Mutations,main="Number of Mutations as a Fxn of Paternal Age",xlab="Paternal Age (years)",ylab="Number of Mutations")
+
+#FIND AND PLOT THE LINEAR REGRESSION !!!!!!!!!!!!!!!
+```
+
 
 <span style="color:green">
 3.	Plot the number of mutations as a function of maternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `MatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?

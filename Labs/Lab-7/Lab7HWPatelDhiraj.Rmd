@@ -5,3 +5,76 @@ date: "5/23/2018"
 output: html_document
 ---
 
+
+### Lab 7 Homework
+
+Due at 1:30 p.m. one week after lab.
+
+Enter the following commands into R:
+
+```{r}
+x <- rnorm(250)
+y <- sqrt(0.30) * x + sqrt(0.70)*rnorm(250)
+```
+
+<span style="color:green">
+1.  Plot x against y.
+</span>
+
+<span style="color:green">
+a.	What is the correlation coefficient between `x` and `y`? 
+</span>
+
+<span style="color:green">
+b.	What is the correlation coefficient squared? Based on this, how much of the value of `y` is predicted by `x`?
+</span>
+
+In this part we will use data from the paper *Rate of de novo mutations and the importance of father's age to disease risk* (Nature, v.488, pp. 471-475, doi:10.1038/nature11396). The `read.table()` command is like the `read.csv()` command, but it allows us to upload .txt files into R. Load the file *kong_mutation_data.txt* into a data frame:
+
+```{r eval = FALSE}
+read.table('kong_mutation_data.txt', header=T)
+```
+
+The first two columns are the paternal and maternal ages, respectively, and the third column is the total number of de novo mutations found in their offspring.
+
+<span style="color:green">
+2.	Plot the number of mutations as a function of paternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `PatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
+</span>
+
+<span style="color:green">
+3.	Plot the number of mutations as a function of maternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `MatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
+</span>
+
+#### PTC Analysis
+In your genetics lab this quarter, you found your TAS2R38 gene haplotype and last week, you tasted PTC as well as several other vegetables. Now, we're going to analyze the association between the tastes of PTC a few of these plants. When the data were compiled, "mild" scores were grouped with "not bitter" scores. The data from class is summarized and loaded into R in the following code chunk.
+
+```{r}
+##Rapini floret contingency table
+bitter <- c("PTC Bitter" = 8, "PTC Not Bitter" = 1) #create numeric vector with column names
+not <- c("PTC Bitter" = 15, "PTC Not Bitter" = 30)
+rapiniFloret <- rbind("Plant Bitter" = bitter, "Plant Not Bitter" = not) #bind row vectors to create matrix
+
+##Rapini stem contingency table
+bitter <- c("PTC Bitter" = 9, "PTC Not Bitter" = 1)
+not <- c("PTC Bitter" = 14, "PTC Not Bitter" = 30)
+rapiniStem <- rbind("Plant Bitter" = bitter, "Plant Not Bitter" = not)
+
+rm(bitter, not) #cleanup
+
+print(list("Rapini Floret" = rapiniFloret, "Rapini Stem" = rapiniStem))
+```
+
+<span style="color:green">
+4.	 What hypothesis test can we use to test for a possible association between PTC bitterness and rapini bitterness?
+</span>
+
+<span style="color:green">
+5.	State the null and alternative hypotheses, and perform the hypothesis test stated in your answer to question 4 on the PTC-rapini floret data. Interpret your result.
+</span>
+
+<span style="color:green">
+6.  Perform this hypothesis test on the PTC-rapini stem data, and again interpret your results. \span
+
+<span style="color:green">
+7. Based on yours answers to questions 5 and 6, can you think of any biological reason to explain the data?
+</span>

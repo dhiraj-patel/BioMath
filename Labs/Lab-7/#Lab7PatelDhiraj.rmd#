@@ -1,0 +1,557 @@
+ ---
+title: "Lab 7: Regression, Data Fitting, and Correlation in R"
+output: html_document
+---
+
+###<span style="color:green">This assignment is due at 11:59 p.m. the day of lab.\span
+
+<span style="color:red">Please submit your lab report by renaming this R Markdown file as "Lab7LastnameFirstname.Rmd" **(please replace Lastname and Firstname with your last and first names, respectively; please do not add spaces, hyphens, or underscores)** and uploading it to the appropriate Lab 7 submission link on Chalk. Please provide answers in this document in the form of <span style="color:blue">blue text</span> and
+```{r eval = FALSE}
+code chunks #with comments when necessary
+```
+<span style="color:red">to all green questions. </span>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = '')
+```
+**Please make sure that you label all of your axes when you plot!**
+
+### Data-frames and Regression
+
+As a part of an investigation into the nature of epilepsy, researchers collected data on neuronal networks. Let's create a vector containing the number of neurons in several neuronal networks: 
+
+```{r}
+numberOfNeurons <- c(8480, 32940, 95833, 386830)
+```
+
+The supercomputer cluster Midway at the University of Chicago was used to analyze this data. Simulating these neuronal networks often requires a substantial amount of computer memory. The following vector contains the amount of RAM in gigabytes needed to run those jobs:
+
+```{r}
+memoryInGB <- c(.8, 5.7, 20.1, 169)
+```
+
+And in addition to the amount of memory used, the computation time for these calculations is as follows:
+
+```{r}
+computationTime <- c(75, 1438, 11001, 171274)
+```
+
+With these vectors defined, we can now easily create a dataframe composed of named columns via:
+
+```{r}
+NeuroComputation <- data.frame(numberOfNeurons, memoryInGB, computationTime)
+NeuroComputation
+```
+
+Now that the relationship between the variables is made explicit, one can easily see that the variables seem to trend with one another. The exact nature of the relationship between the variables, however, remains less clear.
+
+Remember that we can slice this dataframe in a few different ways. We could either use indexing NeuroComputation[,1] to access the first column in the data frame:
+
+```{r}
+NeuroComputation[,1]
+```
+
+Or we could use the command `NeuroComputation$numberOfNeurons` to access the column of the data frame called `numberOfNeurons`:
+
+```{r}
+NeuroComputation$numberOfNeurons
+```
+
+Similarily, if we wanted the second column, we could use: 
+
+```{r}
+NeuroComputation[,2]
+```
+
+or
+
+```{r}
+NeuroComputation$memoryInGB
+```
+
+Same deal.
+
+This type of data is very common in bioinformatics and computational modeling. When developing algorithms, it is very important to understand how much time and memory calculations take as they grow in size. How can we graph these data? 
+
+<span style="color:green">
+1. Plot the amount of memory used as a function of the size of the network. Be sure to provide appropriate axis labels. \span
+
+```{r}
+yvar<-NeuroComputation$memoryInGB
+xvar<-NeuroComputation$numberOfNeurons
+plot(xvar,yvar,xlab="Number of Neurons",ylab="Memory Used (GB)", main="Amount of Memory Used as a Function of the Size of the Neural Network",type="o",col="blue")
+
+LinFit <- lm(memoryInGB ~ numberOfNeurons, data = NeuroComputation)
+
+abline(LinFit, col="red")
+```
+
+
+<span style="color:green">
+2. Examine the plot, and describe the relationship between the two variables.
+</span>
+<span style="color:blue">The relationship appears to be expontential between the two variables. As you increase the number of neurons the memory size increases exponentially.</span>
+
+While these data points themselves are helpful, we need to perform more extrapolation in order to make them useful in "real world" situations. That is, we want to create a continuous model of the data so that for any neuron of size `X` we can predict the amount of memory or computing time `Y` required.
+
+The simplest way to perform a task such as this is to fit a line to the data. In R, this can be accomplished with the `lm()` function (it creates a "Linear Model").
+The general form of the linear fit is:
+
+```{r eval = FALSE}
+myfit <- lm(Y ~ X, dataframe)
+```
+
+where `dataframe` is the name of your data set, `X`  is the explanatory variable, and `Y` is the response variable. For example:
+
+```{r}
+LinFit <- lm(memoryInGB ~ numberOfNeurons, data = NeuroComputation)
+```
+
+This command makes a linear fit of the memory as a function of the number of neurons, using data from the data frame `NeuroComputation`. We then assign the results to the variable `LinFit`. Note the `~` is used similarly to the boxplot command. To break it down, we want to plot the amount of memory used as a function of the size of the neurons. So `~` can be thought of to mean "as a function of".
+
+Let's ask R to tell us something about this fit. One very useful command you'll be using throughout this lab is `summary()`. The input to `summary()` is the fit from a linear regression:
+
+```{r}
+summary(LinFit)
+```
+
+4.585e-04 represents the slope of the line and -1.117e+01 represents the y-intercept of the line.
+
+We can check the fit by typing:
+
+```{r eval = FALSE}
+abline(LinFit, col="red")
+```
+
+This command should have added a line of best fit onto the data points you plotted before. 
+
+<span style="color:blue">
+The residuals are the difference between the value that the fit would predict and the actual value. Knowing this, we would like the values of our residuals to be as close to zero as possible. For example, the residual value of 8.942 is the difference between the actual datum at index 1 and its corresponding point on the fitted line.   
+
+<span style="color:green">
+3. Given what you have learned about data fitting and what was explained about residuals above, does the linear model we applied fit the data well? \span
+
+<span style="color:blue">If you look at the plot above, you can see that the linear model that we applied does not fit the data well. It shows a linear relationship between the two varaibles; however, we know there is suppose to be an exponential relationship. </span>
+
+<span style="color:green">
+4. Is the value of the intercept sensical in the context of the variables that we are examining? Why or why not?
+</span>
+
+<span style="color:blue">The value of the intercept is not sensical in the context of the variables that we are examining. The y-intercept of the line represents a value for the memory that is being used in gigabytes, and memory cannot be a negative number; however, the value calculated from the linear model we applied is negative, so it is nonsensical.</span>
+
+Notice the last line of the `summary()` output mentions an F-statistic. This refers to a type of hypothesis test called an F-test, which is a test used to compare a statistical model to data. If the two variables are `x` and `y`, the null hypothesis of an F-test states that the slope of the regression line between `x` and `y` is 0, so `y` cannot be predicted by `x` using a linear model. In this case, we are trying to fit a linear model to our memory size and neural network data. 
+
+<span style="color:green">
+5.	State the null and alternative hypothesis of the F-test for our data. What does the p-value represent here? What is the result of this hypothesis testing?
+</span>
+
+<span style="color:blue">Null: The slope of the regression line between memory used in gigabytes and number of neurons in the network is 0, so the number of gigabytes of memory used cannot be predicated by the size of the network using a linear model. Alternative: The slope of the regression line between memory used in gigabytes and number of neurons in the network IS NOT equal to 0, so the number of gigabytes of memory used CAN BE predicated by the size of the network using a linear model. The p-value is determined by the F- statistic and it is the probability that your results could have happened by chance. Here the p-value is very less than the significance level (0.05), and so we reject the null hypothesis in this hypothesis test. </span>
+
+<span style="color:blue">
+$R^2$ measures the fraction of variance in $Y$ explained by $X$ in the regression line. The values of the $R^2$ vary between 0 to 1 (the closer the value to 1 the better the linear fit). In this case the $R^2$ is 0.9878 and the p-value is 0.006112. The linear fit isn't too bad from the "metrics" standpoint, except that it is bad, if you look at the residuals and at the plot! This is a lesson to be careful about $R^2$, and p-values to make fitting decisions, especially with a small number of data points as we have here. 
+If we ask the model to predict the smallest value:
+
+```{r}
+predict(LinFit, list(numberOfNeurons=8480))
+
+```
+
+Since 8480 was in our original data set, we can find the actual amount of memory corresponding to 8480 neurons with the following command:
+
+```{r}
+NeuroComputation$memoryInGB[1]
+```
+
+The output given by the `predict()` function, when compared to the actual value, is clearly not a very good prediction!
+
+<span style="color:green">
+6.	Plot `memoryInGB` as a function of `numberOfNeurons`. Add the fit line as explained above. Looking at the plot, does the relationship between the two variables seem linear? Would a non-linear function potentially fit the data better?
+</span>
+
+```{r}
+#This is done earlier in the lab above. A non-linear function might fit the data better because it would help show the exponential relationship between the two variables. The relationship is definitely not linear. 
+```
+
+Try the following command.
+
+```{r}
+QuadFit <- lm(memoryInGB ~ 0 + numberOfNeurons + I(numberOfNeurons^2), data=NeuroComputation)
+```
+
+<span style="color:green">
+7.	Use the `summary()` command from above and determine if you think this new quadratic model fits the data better than the one above. Use the `predict()` function to provide you with expected (not actual!) values for `RAMmemoryInGB` for each value in `NeuroComputation$numberOfNeurons` according to this model. Explain your answer.
+</span>
+
+```{r}
+summary(QuadFit)
+predict(QuadFit,list(numberOfNeurons=8480))
+NeuroComputation$memoryInGB[1]
+
+predict(QuadFit,list(numberOfNeurons=32940))
+NeuroComputation$memoryInGB[2]
+
+predict(QuadFit,list(numberOfNeurons=95833))
+NeuroComputation$memoryInGB[3]
+
+predict(QuadFit,list(numberOfNeurons=386830))
+NeuroComputation$memoryInGB[4]
+
+#When you run the previous commands you can see that the predicted values are all very very close to the observed values in the data frame, which makes the quadratic model a good fit for the data.  
+```
+
+
+The `lines()` function in R adds information to an already existing plot window. Usually, you will add it after a `plot()` command that creates a graph. The input of the `lines()` function is the same as the input for `plot()`, except you normally won't add `xlab`, `ylab`, or `main` parameters since the ones from the plot command take precedence. For example, if we have vectors `x` and `y` and we `plot(x,y)`, we might want to visualize how the predicted values from our model match the actual values. So we could use our fit to define a new vector `ypredicted`, and then add the command `lines(x, ypredicted, col="red")`. 
+  
+<span style="color:green">
+8.	For the `numberofNeurons` and `RAMmemoryinGB` data, plot the original set of data. Then define a new vector for the amount of memory our quadratic model would predict with the `predict()` function. Use the `lines()` function to add your predicted values to the plot. How well do the predicted values match the actual values?
+</span>
+
+
+```{r}
+yvar<-NeuroComputation$memoryInGB
+xvar<-NeuroComputation$numberOfNeurons
+plot(xvar,yvar,xlab="Number of Neurons",ylab="Memory Used (GB)", main="Amount of Memory Used as a Function of the Size of the Neural Network",type="o",col="green")
+
+
+quadModPredicted <- c(predict(QuadFit,list(numberOfNeurons=8480))
+,predict(QuadFit,list(numberOfNeurons=32940))
+,predict(QuadFit,list(numberOfNeurons=95833))
+,predict(QuadFit,list(numberOfNeurons=386830)))
+
+lines(xvar,quadModPredicted,col="purple")
+
+#The predicted values match the actual values very well. With the naked eye, I cannot even see the difference between the purple and green lines, because it is such a good fit. 
+```
+
+
+
+
+### Data fitting
+
+Below are examples of mathematical functions *(not R functions!)* that are frequently used in biological models. They both have the same independent variable $t$ (time), but have different numbers of parameters.
+
+#### Linear function: 
+$$y = At + B$$
+
+#### Exponential decay function:
+$$y = Ae^{-kt} + B$$
+
+<span style="color:green">
+9. Create a numeric vector `t` from 1 to 100 with a step size of 0.2. Write a linear function of time with your own values for the parameters `A` and `B`. Plot the function over the values given in the vector `t`.
+</span>
+
+```{r}
+t <- seq(1,100,0.2)
+
+A <- 10
+B <- 2500
+
+y<-((A*t)+B)
+plot(t,y,xlab="time",ylab="Y-value")
+```
+
+
+
+While it is convenient to pick static values for these parameters, this is not appropriate as it will not always produce the best possible fit on our data. We will play around with the values of the parameters to determine how each influences the fit of the data. 
+
+<span style="color:green">
+10.	Experiment with the values of `A` and `B` in your linear function and describe how each parameter affects the plot.
+</span>
+
+<span style="color:blue">If you increase the value for A while keeping B constant, the line stays the same but the scale for the y-axis increases by a lot, which indicates that the change in y increases and so does the slope. If you decrease A while Keeping B constant, the slope will decrease because the change in y decreases. If you increase B while keeping A constant, the y axis also changes in order to make sure the y intercept is represented in the plot. Decreasing B lowers the y-intercept, and increasing B raises the value for the y-intercept. </span>
+
+
+<span style="color:green">
+11.	Write an exponential decay function of time. Pick your own values of the parameters `A`, `B`, and `k`, and plot the function over the values given in the vector `t`.
+</span>
+
+
+```{r}
+A<-10
+B<-20
+k<-5
+
+expDecay <-((A*exp((-1*k)*(t)))+B)
+plot(t,expDecay,xlab="time",ylab="y values",col="blue")
+```
+
+
+<span style="color:green">
+12.	Use your exponential decay function and experiment with the values of `A`, `B`, and `k` and describe how each parameter affects the plot.
+</span>
+
+<span style="color:blue">Increasing A increases the y axis scale it make the initial amount at time = 0 a lot higher. Increasing B sort of scales up the values for each vector element. So if you change to B to a really high number, then the values in the expDecay vector all increase by that same amount since you have to add a constant B to each value. Increasing k changes the line to one of zero slope, where all the values become consistent at whatever value B is set to.  </span>
+
+<span style="color:green">
+13.	Model `memoryInGB` as a function of `numberOfNeurons` using an exponential decay function. Use $k = -0.000052$, $A=10^{-7}$, and $B=10$. Use the `lines()` function to add the exponential fit line to a plot of the actual data, and describe the visual quality of the fit. Is the quadratic fit or exponential fit better for these data? Explain your answer.
+</span>
+
+```{r}
+xlabvar <- NeuroComputation$numberOfNeurons
+ylabvar <- NeuroComputation$memoryInGB
+A<- (10^(-1*7))
+B<-10
+k<-(-1*0.000052)
+expDecayNeuro <-((A*exp((-1*k)*(xlabvar)))+B)
+plot(NeuroComputation$numberOfNeurons,NeuroComputation$memoryInGB,col="red",xlab="Neuron Number",ylab="Memory Used in GB",type="o")
+lines(xlabvar,expDecayNeuro,col="blue")
+lines(xlabvar,quadModPredicted,col="black")
+# The quadratic fit works better, you can see that the red and black lines overlap, which means the predicted values are very close to the actual values, whereas the exponential fit line varies significantly from the actual values. The actual values are shown in red 
+```
+
+
+<span style="color:green">
+14.	 Let `Vec1` be a numeric vector from 0 to 40 with a step size of 0.2. Use the linear function that you wrote in Question 9 to produce a vector `Vec2` using `Vec1` vector as the input. Then perform a linear regression with the command `lm()` to generate a linear model (`Vec1` should be the explanatory variable and `Vec2` should be the response variable) . Does it return the correct slope and intercept with $R^2 = 1$?
+</span>
+
+```{r}
+Vec1<-seq(0,40,0.2)
+A<-10
+B<-25
+Vec2<-((A*Vec1)+B)
+linFitFourteen <- lm(Vec2 ~ Vec1)
+linFitFourteen
+summary(linFitFourteen)
+#this model returns the correct slope and intercept, and an R squared value of 1.0!!!! "essentially perfect fit!"
+```
+
+
+<span style="color:green">
+15.	 Now, generate a vector of random numbers of the same length as `Vec1` (using the function `runif(n = length(Vec1), min = -1, max = 1)`) and multiply this random vector by some scalar value `s`. Add this quantity to the vector `Vec2` and call this new vector `Vec3`. This simulates a data set with noise where the constant `s` denotes the strength of the noise. Starting with a small value of the constant `s`, increase it gradually, and perform linear regression of `Vec3` on `Vec1` (`Vec1` should be the explanatory variable and `Vec3` should be the response variable). How do the best-fit slope and intercept change as the noise strength is increased? How does the $R^2$ value change?
+</span>
+
+```{r}
+lastQuestionsFunction <- function(s){
+  vec3<-runif(n=length(Vec1),min=-1,max=1)
+  vec3<-vec3*s
+  Vec3 <- vec3+Vec2
+  lm(Vec3~Vec1)
+  linFitFifteen<-lm(Vec3~Vec1)
+  print(summary(linFitFifteen)) 
+  return(linFitFifteen)
+}
+lastQuestionsFunction(233234234234)
+#When s is relatively small, the slope and intercept are very very close to the actual values, as you increase s, the variation from the actual values increase more and more, at really high values for s, the slope and intercept are no longer sensical values. The R squared values gets farther and farther awaay from 1.0 and closer and closer to 0.0.
+```
+
+
+<span style="color:green">
+16.	 To visualize the relationship between noise and $R^2$, or the correlation coefficient squared, execute the command `plot(Vec1, Vec3)` for `s`=15, `s`=55, and `s`=550.
+</span>
+
+```{r}
+plotLastOnes <- function(s){
+  vec3<-runif(n=length(Vec1),min=-1,max=1)
+  vec3<-vec3*s
+  Vec3 <- vec3+Vec2
+  return(plot(Vec1,Vec3))
+}
+
+plotLastOnes(15)
+plotLastOnes(55)
+plotLastOnes(550)
+# as you increase s you see that the data points start spreading out from the line of best fit. The smallest s value gives you the closest values. 
+```
+
+### Correlation
+
+The data that we get from experiments is almost never as cut and dry as the examples that we worked with in the questions above. First, usually datasets are much bigger. Second, if there is a relationship among variables, it is far less obvious. In these cases, exploratory data analysis is often used. For example:
+
+```{r}
+x <- runif(300)
+y <- runif(300)
+plot(x,y)
+```
+
+Doesn't look like there is much of a relationship, but is this truly the case? To answer this question, we can look at the correlation coefficient, one of the simplest tools in exploratory data analysis.
+
+<span style="color:blue">
+Linear (Pearson) correlation coefficient measures the strength and direction of the linear association between two numerical variables. This coefficient varies in value between -1 to 1. 1 represents a perfect positive correlation, -1 represents a perfect negative correlation, and 0 tells us that the two variables are essentially unrelated. $R^2$ is the correlation coefficient *squared*.
+
+```{r}
+cor(x,y)
+```
+
+Indeed the value is very small, suggesting that knowing `x`, doesn't tell us much about `y`. Note: Be mindful that the Pearson correlation coefficient works well only with linear relationships.
+
+Now, let's try to pick the data points from a normal distribution:
+```{r}
+x <- rnorm(1000)
+y <- rnorm(1000)
+plot (x,y)
+cor(x,y)
+```
+
+Note that the numbers used here are random, so your own value of `cor()` and the appearance of your plot will likely be different than above.
+
+<span style="color:green">
+17.	Why is the correlation coefficient so small for two random sets of normally distributed samples?
+</span>
+
+<span style="color:blue">The correlation coefficient is so small for two random sets of normally distributed samples because these samples are randomly selected and normally distributed, so there is not a linear relationship and we would not expect there to be a high correlation coefficient value.</span>
+
+Let's investigate this in more detail by repeating the task. Below, you will write functions to sample two vectors of size `x` from a particular distribution and calculate and return the correlation coefficient. Then you can use your functions to simulate a large number of trails.
+
+<span style="color:green">
+18.	Write an R function that takes a numeric value `x` as its argument. Within the function, create two random number vectors of size `x` sampled from a normal distribution. Use `cor()` to calculate the correlation coefficient, and return this value.
+</span>
+
+```{r}
+foo <- function(x){
+  myvec1 <- rnorm(x)
+  myvec2 <- rnorm(x)
+  return(cor(myvec1,myvec2))
+}
+```
+
+
+<span style="color:green">
+19.	With a for loop and the function you wrote for question 18, perform a simulation for 999 trials with each having a sample size of `x`=99. Save the correlation coefficient to a vector, and plot the results of the simulation as a histogram. What does the distribution look like? Is this what you'd expect?
+</span>
+
+```{r}
+x<-99
+placeHolderVec<-numeric(999)
+for(i in 1:999){
+  placeHolderVec[i] <- foo(x)
+}
+hist(placeHolderVec,col="green")
+#This looks like a normal distribution, with the correlation values between -0.3 to 0.3, and this is what we would expect, because since we are running correlation simulations of random values from the normal distribution, all of our correlation values should be around 0.0, since we determined above that the correlation coefficients should be small for two random samples from the normal distribution. 
+```
+
+
+
+<span style="color:green">
+20.	Perform the same task as above, but write a new function that samples random numbers from a uniform distribution. (Hint: use `runif()`). What does the distribution look like? Is this what you'd expect?
+</span>
+
+```{r}
+bar <- function(x){
+  myvec1 <- runif(x)
+  myvec2 <- runif(x)
+  return(cor(myvec1,myvec2))
+}
+x<-99
+placeHolderVecUnif<-numeric(999)
+for(i in 1:999){
+  placeHolderVecUnif[i] <- bar(x)
+}
+hist(placeHolderVecUnif,col="yellow")
+
+#The distribution looks the same because, we are still picking random values from a distribution so the correlation coefficients should still be small
+```
+
+
+<span style="color:green">
+21.	 Perform the same task as above, but write a new function that samples random numbers from the chi-squared distribution (type ?rchisq into the console for the help page for the rchisq() function if needed) for df = 10. What does the distribution look like? Is this what you would expect?
+</span>
+
+```{r}
+chunks <- function(x){
+  myvec1 <- rchisq(x,df=10)
+  myvec2 <- rchisq(x,df=10)
+  return(cor(myvec1,myvec2))
+}
+x<-99
+placeHolderVecChi<-numeric(999)
+for(i in 1:999){
+  placeHolderVecChi[i] <- chunks(x)
+}
+hist(placeHolderVecChi,col="red")
+
+#The distribution looks the same because, we are still picking random values from a distribution so the correlation coefficients should still be small
+```
+
+
+<span style="color:green">
+22.  Overall, what can you expect for the correlation coefficient from a perfectly random sample, regardless of the distribution?
+</span>
+
+<span style="color:blue">When you try to find the correlation coefficient from a perfectly random sample, regardless of the distribution, you should always get small values since you are always picking randomly DOES NOT MATTER WHAT TYPE OF DISTRIBUTION YOU TAKE IT FROM!</span>
+
+<span style="color:green">
+23.	Set `x <- c(rnorm(199,0,1), rnorm(199,10,1))` and `y <- c(rnorm(199,0,1), rnorm(199,10,1))`. Note that `x` and `y` are created completely independently. Plot x against y, compute the correlation coefficient, and briefly discuss your findings. What does this example tell you about how you should interpret correlation coefficients? 
+</span>
+
+```{r}
+x<-c(rnorm(199,0,1),rnorm(199,10,1))
+y <- c(rnorm(199,0,1), rnorm(199,10,1))
+plot(x,y)
+cor(x,y)
+
+#We have to make sure that we know when to use the correlation coefficients. We should only use the correlation coefficients when attempting to analyze the relationship between two sets of data that appear to have a linear relationship; whereas in this example the two sets of data are completely unrelated. 
+```
+
+
+### Lab 7 Homework
+
+Due at 1:30 p.m. one week after lab.
+
+Enter the following commands into R:
+
+```{r}
+x <- rnorm(250)
+y <- sqrt(0.30) * x + sqrt(0.70)*rnorm(250)
+```
+
+<span style="color:green">
+1.  Plot x against y.
+</span>
+
+<span style="color:green">
+a.	What is the correlation coefficient between `x` and `y`? 
+</span>
+
+<span style="color:green">
+b.	What is the correlation coefficient squared? Based on this, how much of the value of `y` is predicted by `x`?
+</span>
+
+In this part we will use data from the paper *Rate of de novo mutations and the importance of father's age to disease risk* (Nature, v.488, pp. 471-475, doi:10.1038/nature11396). The `read.table()` command is like the `read.csv()` command, but it allows us to upload .txt files into R. Load the file *kong_mutation_data.txt* into a data frame:
+
+```{r eval = FALSE}
+read.table('kong_mutation_data.txt', header=T)
+```
+
+The first two columns are the paternal and maternal ages, respectively, and the third column is the total number of de novo mutations found in their offspring.
+
+<span style="color:green">
+2.	Plot the number of mutations as a function of paternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `PatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
+</span>
+
+<span style="color:green">
+3.	Plot the number of mutations as a function of maternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `MatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
+</span>
+
+#### PTC Analysis
+In your genetics lab this quarter, you found your TAS2R38 gene haplotype and last week, you tasted PTC as well as several other vegetables. Now, we're going to analyze the association between the tastes of PTC a few of these plants. When the data were compiled, "mild" scores were grouped with "not bitter" scores. The data from class is summarized and loaded into R in the following code chunk.
+
+```{r}
+##Rapini floret contingency table
+bitter <- c("PTC Bitter" = 8, "PTC Not Bitter" = 1) #create numeric vector with column names
+not <- c("PTC Bitter" = 15, "PTC Not Bitter" = 30)
+rapiniFloret <- rbind("Plant Bitter" = bitter, "Plant Not Bitter" = not) #bind row vectors to create matrix
+
+##Rapini stem contingency table
+bitter <- c("PTC Bitter" = 9, "PTC Not Bitter" = 1)
+not <- c("PTC Bitter" = 14, "PTC Not Bitter" = 30)
+rapiniStem <- rbind("Plant Bitter" = bitter, "Plant Not Bitter" = not)
+
+rm(bitter, not) #cleanup
+
+print(list("Rapini Floret" = rapiniFloret, "Rapini Stem" = rapiniStem))
+```
+
+<span style="color:green">
+4.	 What hypothesis test can we use to test for a possible association between PTC bitterness and rapini bitterness?
+</span>
+
+<span style="color:green">
+5.	State the null and alternative hypotheses, and perform the hypothesis test stated in your answer to question 4 on the PTC-rapini floret data. Interpret your result.
+</span>
+
+<span style="color:green">
+6.  Perform this hypothesis test on the PTC-rapini stem data, and again interpret your results. \span
+
+<span style="color:green">
+7. Based on yours answers to questions 5 and 6, can you think of any biological reason to explain the data?
+</span>

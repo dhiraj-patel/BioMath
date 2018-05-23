@@ -59,13 +59,28 @@ The first two columns are the paternal and maternal ages, respectively, and the 
 ```{r}
 plot(myFile$PatAge,myFile$Mutations,main="Number of Mutations as a Fxn of Paternal Age",xlab="Paternal Age (years)",ylab="Number of Mutations")
 
-#FIND AND PLOT THE LINEAR REGRESSION !!!!!!!!!!!!!!!
+
+LinFit<-lm(myFile$Mutations ~ myFile$PatAge, data=myFile)
+abline(LinFit)
+# The slope of the line is the R^2 coefficient between the two variables, paternal age and number of mutations. So 65.34% of tf the variance is explained by the linear relationship ! 
+summary(LinFit)
 ```
 
 
 <span style="color:green">
 3.	Plot the number of mutations as a function of maternal age. Use the commands learned in lab to find and plot the linear regression for mutations as a function of `MatAge` (label your axes). What does the slope of that line tell you? What fraction of the variance is explained by the linear relationship?
 </span>
+
+```{r}
+plot(myFile$MatAge,myFile$Mutations,main="Number of Mutations as a Fxn of Maternal Age",xlab="Maternal Age (years)",ylab="Number of Mutations")
+
+
+LinFitmommy<-lm(myFile$Mutations ~ myFile$MatAge, data=myFile)
+abline(LinFitmommy)
+# The slope of the line is the R^2 coefficient between the two variables, paternal age and number of mutations. So 48.11%% of tf the variance is explained by the linear relationship ! 
+summary(LinFitmommy)
+```
+
 
 #### PTC Analysis
 In your genetics lab this quarter, you found your TAS2R38 gene haplotype and last week, you tasted PTC as well as several other vegetables. Now, we're going to analyze the association between the tastes of PTC a few of these plants. When the data were compiled, "mild" scores were grouped with "not bitter" scores. The data from class is summarized and loaded into R in the following code chunk.
@@ -90,13 +105,42 @@ print(list("Rapini Floret" = rapiniFloret, "Rapini Stem" = rapiniStem))
 4.	 What hypothesis test can we use to test for a possible association between PTC bitterness and rapini bitterness?
 </span>
 
+<span style="color:blue">We can use the chi square goodness of fit test to see if there is a possible assocation between PTC bitterness and rapini bitterness.</span>
+
 <span style="color:green">
 5.	State the null and alternative hypotheses, and perform the hypothesis test stated in your answer to question 4 on the PTC-rapini floret data. Interpret your result.
 </span>
 
+<span style="color:blue">H0: Null Hypothesis: There is no association between PTC bitterness and rapini floret bitterness. Alternative Hypothesis: Ha: There is some assocation between PTC bitterness and rapini floret bitterness.</span>
+
+```{r}
+#need to make an expected values matrix:
+observed<-matrix(nrow=2,ncol=2,data=c(8,1,15,30),byrow=TRUE)
+datavec<-c(3.8333, 5.16667, 19.16667, 25.8333)
+expectedVec <- matrix(nrow=2,ncol=2,data=datavec,byrow=TRUE)
+chiSqVal <- sum(((observed-expectedVec)^2)/expectedVec)
+chiSqVal
+#Here we have (2-1)*(2-1) = 1 degree of freedom, and a signficance level of 5%, so the critical value is: 3.84. Our Chi square calculated value (9.467169) is greater than the critical value so we reject the null hypothesis. 
+```
+
+
+
 <span style="color:green">
 6.  Perform this hypothesis test on the PTC-rapini stem data, and again interpret your results. \span
+
+```{r}
+#need to make an expected values matrix:
+observedTwo<-matrix(nrow=2,ncol=2,data=c(9,1,14,30),byrow=TRUE)
+datavec<-c(4.259,5.741,18.741,25.25926)
+expectedVecTwo <- matrix(nrow=2,ncol=2,data=datavec,byrow=TRUE)
+chiSqValTwo <- sum(((observedTwo-expectedVecTwo)^2)/expectedVecTwo)
+chiSqValTwo
+#Here we have (2-1)*(2-1) = 1 degree of freedom, and a signficance level of 5%, so the critical value is: 3.84. Our Chi square calculated value (11.28185) is greater than the critical value so we reject the null hypothesis. 
+```
+
 
 <span style="color:green">
 7. Based on yours answers to questions 5 and 6, can you think of any biological reason to explain the data?
 </span>
+
+<span style="color:blue">There is correlation between the two categorical variables; however, there is not a causation? </span>

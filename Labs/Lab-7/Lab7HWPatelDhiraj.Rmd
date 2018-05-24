@@ -39,7 +39,8 @@ b.	What is the correlation coefficient squared? Based on this, how much of the v
 
 ```{r}
 print(paste("the correlation coefficient squared is",((cor(x,y))^2)))
-#Based on this [ ] of the value of y is predicted by x. 
+
+print(paste("based on this , the value of y predicted by x is:",((cor(x,y))^2)*100,"%"))
 
 ```
 
@@ -57,12 +58,14 @@ The first two columns are the paternal and maternal ages, respectively, and the 
 </span>
 
 ```{r}
+myFile <- read.table('kong_mutation_data.txt', header=T)
+
 plot(myFile$PatAge,myFile$Mutations,main="Number of Mutations as a Fxn of Paternal Age",xlab="Paternal Age (years)",ylab="Number of Mutations")
 
 
 LinFit<-lm(myFile$Mutations ~ myFile$PatAge, data=myFile)
 abline(LinFit)
-# The slope of the line is the R^2 coefficient between the two variables, paternal age and number of mutations. So 65.34% of tf the variance is explained by the linear relationship ! 
+# The slope of the line is the "rise over run" ratio, between the two variables, paternal age and number of mutations. In other words it is the change in number of mutations divided by the change in paternal age. So here 65.34% of the variance is explained by the linear relationship (R^2 = 0.6534)! 
 summary(LinFit)
 ```
 
@@ -77,7 +80,7 @@ plot(myFile$MatAge,myFile$Mutations,main="Number of Mutations as a Fxn of Matern
 
 LinFitmommy<-lm(myFile$Mutations ~ myFile$MatAge, data=myFile)
 abline(LinFitmommy)
-# The slope of the line is the R^2 coefficient between the two variables, paternal age and number of mutations. So 48.11%% of tf the variance is explained by the linear relationship ! 
+# The slope of the line is the rise over run ratio between paternal age and number of mutations. It represents the change in the number of mutations overSo 48.11%% of tf the variance is explained by the linear relationship ! 
 summary(LinFitmommy)
 ```
 
@@ -143,4 +146,4 @@ chiSqValTwo
 7. Based on yours answers to questions 5 and 6, can you think of any biological reason to explain the data?
 </span>
 
-<span style="color:blue">There is correlation between the two categorical variables; however, there is not a causation? </span>
+<span style="color:blue">The two chi square tests show that there is an assocation between PTC biterness and rapini floret/stem biterness. This probably because if you are able to taste the biterness in PTC then you have the gene that codes for PTC receptor, which means you can taste biterness in all foods.</span>
